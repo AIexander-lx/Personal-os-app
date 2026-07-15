@@ -7,6 +7,7 @@ export const STORE_KEYS = [
   'gamification-store',
   'project-store',
   'career-store',
+  'schedule-store',
 ] as const
 
 const APP_MARKER = 'personal-os'
