@@ -31,6 +31,16 @@ function playChime() {
   }
 }
 
+/** Notificación del navegador (si el usuario dio permiso). */
+function notify(title: string, body: string) {
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return
+  try {
+    new Notification(title, { body, icon: '/icon.svg', tag: 'personal-os-timer' })
+  } catch {
+    /* algunos navegadores exigen ServiceWorkerRegistration.showNotification */
+  }
+}
+
 export default function Study() {
   const courses = useCourseStore((s) => s.courses)
   const sessions = useUserStore((s) => s.sessions)
@@ -45,8 +55,12 @@ export default function Study() {
   const [customMinutes, setCustomMinutes] = useState(45)
   const [remaining, setRemaining] = useState(45 * 60)
   const [running, setRunning] = useState(false)
+  /** Timestamp de fin; el reloj se deriva de él para no desfasarse en pestañas de fondo. */
+  const [endsAt, setEndsAt] = useState<number | null>(null)
   const [lastReward, setLastReward] = useState<{ xp: number; topic: string } | null>(null)
-  const intervalRef = useRef<number | null>(null)
+  const [notifPerm, setNotifPerm] = useState<NotificationPermission | 'unsupported'>(
+    typeof Notification === 'undefined' ? 'unsupported' : Notification.permission,
+  )
 
   const topic = selectedCourse?.topics.find((t) => t.id === topicId) ?? selectedCourse?.topics[0]
 
@@ -57,13 +71,14 @@ export default function Study() {
     }
   }, [selectedCourse, topicId])
 
-  // Ajustar el reloj cuando cambia la duración (si no está corriendo).
-  useEffect(() => {
-    if (!running) setRemaining(minutes * 60)
-  }, [minutes, running])
+  const requestNotifications = async () => {
+    if (typeof Notification === 'undefined') return
+    setNotifPerm(await Notification.requestPermission())
+  }
 
   const complete = () => {
     setRunning(false)
+    setEndsAt(null)
     playChime()
     if (selectedCourse && topic) {
       const s = addSession({
@@ -75,28 +90,48 @@ export default function Study() {
       })
       evaluate()
       setLastReward({ xp: s.xp, topic: topic.name })
+      notify('¡Sesión completada! 🎉', `+${s.xp} XP en ${topic.name}`)
     }
     setRemaining(minutes * 60)
   }
 
-  // Tick del timer.
+  // `complete` se guarda en un ref para que el tick siempre use la versión actual.
+  const completeRef = useRef(complete)
+  completeRef.current = complete
+
+  // Tick del timer, derivado de `endsAt` (inmune al throttling de pestañas en fondo).
   useEffect(() => {
-    if (!running) return
-    intervalRef.current = window.setInterval(() => {
-      setRemaining((r) => {
-        if (r <= 1) {
-          window.clearInterval(intervalRef.current!)
-          complete()
-          return 0
-        }
-        return r - 1
-      })
-    }, 1000)
-    return () => {
-      if (intervalRef.current) window.clearInterval(intervalRef.current)
+    if (!running || endsAt === null) return
+    let fired = false
+    const tick = () => {
+      const left = Math.max(0, Math.round((endsAt - Date.now()) / 1000))
+      setRemaining(left)
+      if (left <= 0 && !fired) {
+        fired = true
+        completeRef.current()
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [running])
+    tick()
+    const id = window.setInterval(tick, 250)
+    return () => window.clearInterval(id)
+  }, [running, endsAt])
+
+  const toggleRun = () => {
+    if (running) {
+      setRunning(false)
+      setEndsAt(null) // `remaining` ya quedó sincronizado por el último tick
+    } else {
+      if (remaining <= 0) setRemaining(minutes * 60)
+      setEndsAt(Date.now() + (remaining > 0 ? remaining : minutes * 60) * 1000)
+      setRunning(true)
+    }
+  }
+
+  const resetTimer = () => {
+    setRunning(false)
+    setEndsAt(null)
+    setRemaining(minutes * 60)
+  }
 
   const progressPct = ((minutes * 60 - remaining) / (minutes * 60)) * 100
   const projectedXP = sessionXP(minutes)
@@ -113,6 +148,7 @@ export default function Study() {
   const setPreset = (m: number) => {
     setMinutes(m)
     setRunning(false)
+    setEndsAt(null)
     setRemaining(m * 60)
   }
 
@@ -161,16 +197,13 @@ export default function Study() {
 
               <div className="mt-4 flex gap-2">
                 <button
-                  onClick={() => setRunning((v) => !v)}
+                  onClick={toggleRun}
                   className="rounded-lg bg-accent/15 px-5 py-2 font-semibold text-accent hover:bg-accent/25"
                 >
                   {running ? '⏸ Pausar' : '▶ Iniciar'}
                 </button>
                 <button
-                  onClick={() => {
-                    setRunning(false)
-                    setRemaining(minutes * 60)
-                  }}
+                  onClick={resetTimer}
                   className="rounded-lg bg-slate-800 px-4 py-2 font-semibold text-slate-200 hover:bg-slate-700"
                 >
                   ↺ Reset
@@ -258,6 +291,23 @@ export default function Study() {
                   50 base + {minutes} × 0.5 bonus
                 </p>
               </div>
+
+              {notifPerm === 'default' && (
+                <button
+                  onClick={requestNotifications}
+                  className="w-full rounded-lg border border-surface-border/60 px-3 py-1.5 text-xs text-slate-300 transition-colors hover:border-accent/50 hover:text-accent"
+                >
+                  🔔 Activar notificaciones al terminar
+                </button>
+              )}
+              {notifPerm === 'granted' && (
+                <p className="text-[11px] text-emerald-300/80">🔔 Notificaciones activas</p>
+              )}
+              {notifPerm === 'denied' && (
+                <p className="text-[11px] text-slate-500">
+                  🔕 Notificaciones bloqueadas en el navegador
+                </p>
+              )}
             </div>
           </div>
 

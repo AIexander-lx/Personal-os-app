@@ -19,7 +19,7 @@ Aplicación **100% frontend** (sin backend) que centraliza el seguimiento de est
 | --- | --- |
 | 🏠 **Dashboard** | Stats (XP, nivel, racha, sesiones), gráfico de XP de 30 días, **bloque de día en vivo** que resalta la actividad actual según la hora, progreso por curso y grid de logros. |
 | 🗺️ **Roadmap** | 6 cursos · 38 temas · 163 ejercicios. Tarjetas expandibles con dificultad y XP por tema, filtros por estado/dificultad y búsqueda. |
-| ⏱️ **Study** | Timer Pomodoro (25/45/90 min o personalizado) con anillo de progreso, cálculo de XP en vivo, historial y estadísticas de estudio. |
+| ⏱️ **Study** | Timer Pomodoro (25/45/90 min o personalizado) con anillo de progreso, cálculo de XP en vivo, historial y estadísticas. El reloj se deriva de un *timestamp*, así que no se desfasa aunque la pestaña quede en segundo plano, y avisa con una **notificación del navegador** al terminar. |
 | 🚀 **StreakStudy** | Tracker del proyecto principal: features y bugs con **drag & drop**, fases, barra de completitud y timeline de avances. |
 | 💪 **Health** | Registro de gimnasio semanal (Lun–Vie), racha, y seguimiento de sueño y energía con gráficos de 7 días. |
 | 🧭 **Career** | Roadmap profesional a 2 años (4 fases) con hitos, skills, certificaciones y contadores de portfolio/comunidad. |
@@ -28,6 +28,10 @@ Aplicación **100% frontend** (sin backend) que centraliza el seguimiento de est
 - **10 niveles profesionales** — de *Beginner* a *Master Architect*.
 - **XP por sesión** = `50 base + 0.5 × minutos` (más bonos por logros).
 - **12 logros desbloqueables** con lógica real (primera sesión, rachas, cursos al 100%, *Perfect Day*, etc.) y **notificaciones (toast)** al desbloquear.
+
+### 📱 PWA
+- **Instalable** en escritorio y móvil (manifest + service worker vía `vite-plugin-pwa`), funciona offline gracias al precacheo.
+- **Notificaciones** del navegador al terminar una sesión de estudio (con permiso del usuario).
 
 ### 💾 Persistencia & respaldo
 - Auto-guardado en `localStorage` vía **Zustand + persist**.
@@ -101,6 +105,7 @@ Los temas de **AED** y **Sistemas Computacionales** están alineados con el síl
 - [x] Horario y cursos editables
 - [x] Respaldo export/import en JSON
 - [x] Tests con Vitest
+- [x] PWA instalable + notificaciones del timer
 - [ ] Backend (Spring Boot + PostgreSQL)
 - [ ] Sincronización multi-dispositivo (AWS)
 - [ ] Autenticación
