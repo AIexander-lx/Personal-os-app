@@ -41,39 +41,39 @@ function ScheduleEditor() {
       {sorted.map((b) => (
         <div
           key={b.id}
-          className="flex flex-wrap items-center gap-2 rounded-lg border border-surface-border/40 bg-slate-800/40 p-2"
+          className="flex flex-wrap items-center gap-2 rounded-lg border border-surface-border/40 bg-elevated/40 p-2"
         >
           <input
             value={b.icon}
             onChange={(e) => updateBlock(b.id, { icon: e.target.value })}
-            className="w-10 rounded-md border border-surface-border/60 bg-slate-900/60 px-1 py-1 text-center text-sm focus:border-accent focus:outline-none"
+            className="w-10 rounded-md border border-surface-border/60 bg-input/60 px-1 py-1 text-center text-sm focus:border-accent focus:outline-none"
             aria-label="Icono"
           />
           <input
             value={b.label}
             onChange={(e) => updateBlock(b.id, { label: e.target.value })}
-            className="min-w-[8rem] flex-1 rounded-md border border-surface-border/60 bg-slate-900/60 px-2 py-1 text-sm text-slate-200 focus:border-accent focus:outline-none"
+            className="min-w-[8rem] flex-1 rounded-md border border-surface-border/60 bg-input/60 px-2 py-1 text-sm text-fg focus:border-accent focus:outline-none"
             aria-label="Nombre del bloque"
           />
           <input
             type="time"
             value={b.start}
             onChange={(e) => updateBlock(b.id, { start: e.target.value })}
-            className="rounded-md border border-surface-border/60 bg-slate-900/60 px-2 py-1 text-xs text-slate-200 focus:border-accent focus:outline-none"
+            className="rounded-md border border-surface-border/60 bg-input/60 px-2 py-1 text-xs text-fg focus:border-accent focus:outline-none"
             aria-label="Inicio"
           />
-          <span className="text-slate-500">–</span>
+          <span className="text-muted-2">–</span>
           <input
             type="time"
             value={b.end}
             onChange={(e) => updateBlock(b.id, { end: e.target.value })}
-            className="rounded-md border border-surface-border/60 bg-slate-900/60 px-2 py-1 text-xs text-slate-200 focus:border-accent focus:outline-none"
+            className="rounded-md border border-surface-border/60 bg-input/60 px-2 py-1 text-xs text-fg focus:border-accent focus:outline-none"
             aria-label="Fin"
           />
           <select
             value={b.to ?? ''}
             onChange={(e) => updateBlock(b.id, { to: e.target.value || undefined })}
-            className="rounded-md border border-surface-border/60 bg-slate-900/60 px-1 py-1 text-xs text-slate-200 focus:border-accent focus:outline-none"
+            className="rounded-md border border-surface-border/60 bg-input/60 px-1 py-1 text-xs text-fg focus:border-accent focus:outline-none"
             aria-label="Enlace"
           >
             {ROUTE_OPTIONS.map((o) => (
@@ -82,7 +82,7 @@ function ScheduleEditor() {
               </option>
             ))}
           </select>
-          <label className="flex items-center gap-1 text-[11px] text-slate-400">
+          <label className="flex items-center gap-1 text-[11px] text-muted">
             <input
               type="checkbox"
               checked={!!b.weekdaysOnly}
@@ -93,7 +93,7 @@ function ScheduleEditor() {
           </label>
           <button
             onClick={() => removeBlock(b.id)}
-            className="ml-auto text-slate-500 hover:text-rose-400"
+            className="ml-auto text-muted-2 hover:text-rose-600 dark:hover:text-rose-400"
             aria-label="Eliminar bloque"
           >
             ✕
@@ -112,7 +112,7 @@ function ScheduleEditor() {
         </button>
         <button
           onClick={() => resetSchedule()}
-          className="rounded-lg border border-surface-border/60 px-3 py-1.5 text-xs text-slate-400 hover:text-rose-300"
+          className="rounded-lg border border-surface-border/60 px-3 py-1.5 text-xs text-muted hover:text-rose-700 dark:hover:text-rose-300"
         >
           ↺ Restaurar
         </button>
@@ -173,7 +173,7 @@ export function DaySchedule() {
           onClick={() => setEditing((v) => !v)}
           className={clsx(
             'badge transition-colors',
-            editing ? 'bg-accent/20 text-accent' : 'bg-slate-700/60 text-slate-300 hover:text-accent',
+            editing ? 'bg-accent/20 text-accent' : 'bg-control/60 text-fg-soft hover:text-accent',
           )}
         >
           {editing ? '✓ Listo' : '✏️ Editar'}
@@ -184,9 +184,9 @@ export function DaySchedule() {
         <ScheduleEditor />
       ) : (
         <>
-          <p className="mb-4 text-sm text-slate-300">{summary}</p>
+          <p className="mb-4 text-sm text-fg-soft">{summary}</p>
           {blocks.length === 0 ? (
-            <p className="py-4 text-center text-sm text-slate-500">
+            <p className="py-4 text-center text-sm text-muted-2">
               Sin bloques. Pulsa <span className="text-accent">✏️ Editar</span> para agregar tu horario.
             </p>
           ) : (
@@ -198,12 +198,12 @@ export function DaySchedule() {
                     className={clsx(
                       'flex items-center gap-3 rounded-lg border px-3 py-2 transition-colors',
                       isCurrent && 'border-accent/50 bg-accent/10 shadow-glow',
-                      b.status === 'done' && 'border-transparent bg-slate-800/30 opacity-55',
-                      b.status === 'upcoming' && 'border-surface-border/40 bg-slate-800/40',
-                      b.status === 'off' && 'border-transparent bg-slate-800/20 opacity-40',
+                      b.status === 'done' && 'border-transparent bg-elevated/30 opacity-55',
+                      b.status === 'upcoming' && 'border-surface-border/40 bg-elevated/40',
+                      b.status === 'off' && 'border-transparent bg-elevated/20 opacity-40',
                     )}
                   >
-                    <span className="w-24 shrink-0 font-mono text-xs text-slate-400">
+                    <span className="w-24 shrink-0 font-mono text-xs text-muted">
                       {b.start}–{b.end}
                     </span>
                     <span className="text-lg">{b.icon}</span>
@@ -211,17 +211,17 @@ export function DaySchedule() {
                       <p
                         className={clsx(
                           'truncate text-sm',
-                          isCurrent ? 'font-semibold text-slate-100' : 'text-slate-200',
-                          b.status === 'done' && 'text-slate-400 line-through',
+                          isCurrent ? 'font-semibold text-fg' : 'text-fg',
+                          b.status === 'done' && 'text-muted line-through',
                         )}
                       >
                         {b.label}
                         {b.status === 'off' && (
-                          <span className="ml-2 text-[11px] text-slate-500">(fin de semana)</span>
+                          <span className="ml-2 text-[11px] text-muted-2">(fin de semana)</span>
                         )}
                       </p>
                       {isCurrent && (
-                        <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-slate-700">
+                        <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-control">
                           <div
                             className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 transition-[width] duration-700"
                             style={{ width: `${b.progress}%` }}
@@ -232,7 +232,7 @@ export function DaySchedule() {
                     {isCurrent ? (
                       <span className="badge shrink-0 bg-accent/20 text-accent">AHORA</span>
                     ) : b.status === 'done' ? (
-                      <span className="shrink-0 text-emerald-400/70">✓</span>
+                      <span className="shrink-0 text-emerald-700 dark:text-emerald-400/70">✓</span>
                     ) : null}
                   </div>
                 )

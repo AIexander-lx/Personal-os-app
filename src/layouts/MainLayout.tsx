@@ -60,12 +60,12 @@ export function MainLayout() {
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-surface-border/50 bg-surface/80 px-4 py-3 backdrop-blur lg:hidden">
           <button
             onClick={() => setOpen(true)}
-            className="rounded-lg border border-surface-border/60 p-2 text-slate-200"
+            className="rounded-lg border border-surface-border/60 p-2 text-fg"
             aria-label="Abrir menú"
           >
             ☰
           </button>
-          <span className="text-sm font-bold text-slate-100">Personal OS</span>
+          <span className="text-sm font-bold text-fg">Personal OS</span>
           <span className="w-9" />
         </header>
 
@@ -83,7 +83,7 @@ export function MainLayout() {
               className={({ isActive }) =>
                 clsx(
                   'flex flex-col items-center gap-0.5 py-2 text-[10px]',
-                  isActive ? 'text-accent' : 'text-slate-400',
+                  isActive ? 'text-accent' : 'text-muted',
                 )
               }
             >

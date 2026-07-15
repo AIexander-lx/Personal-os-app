@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { clsx } from 'clsx'
-import { useUserStore } from '@/store'
+import { useUserStore, useThemeStore } from '@/store'
 import { useToastStore } from '@/store/toastStore'
 import {
   getLevelInfo,
@@ -26,6 +26,8 @@ export function NavBar() {
   const user = useUserStore((s) => s.user)
   const level = getLevelInfo(user.totalXP)
   const pushToast = useToastStore((s) => s.push)
+  const theme = useThemeStore((s) => s.theme)
+  const toggleTheme = useThemeStore((s) => s.toggle)
   const [confirming, setConfirming] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -64,16 +66,24 @@ export function NavBar() {
           <span className="text-lg font-black">P</span>
         </div>
         <div>
-          <p className="text-sm font-bold leading-none text-slate-100">Personal OS</p>
-          <p className="text-[11px] text-slate-400">Centro de control</p>
+          <p className="text-sm font-bold leading-none text-fg">Personal OS</p>
+          <p className="text-[11px] text-muted">Centro de control</p>
         </div>
+        <button
+          onClick={toggleTheme}
+          className="ml-auto grid h-9 w-9 place-items-center rounded-lg border border-surface-border/60 text-base transition-colors hover:border-accent/50 hover:bg-elevated"
+          aria-label={theme === 'dark' ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'}
+          title={theme === 'dark' ? 'Tema claro' : 'Tema oscuro'}
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
       </div>
 
       <div className="card-surface p-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-slate-100">{user.name}</p>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-sm font-semibold text-fg">{user.name}</p>
+            <p className="text-[11px] text-muted">
               Nivel {level.level} · {level.title}
             </p>
           </div>
@@ -105,13 +115,13 @@ export function NavBar() {
         <div className="flex gap-2">
           <button
             onClick={handleExport}
-            className="flex-1 rounded-lg border border-surface-border/60 px-2 py-1.5 text-xs text-slate-300 transition-colors hover:border-accent/50 hover:text-accent"
+            className="flex-1 rounded-lg border border-surface-border/60 px-2 py-1.5 text-xs text-fg-soft transition-colors hover:border-accent/50 hover:text-accent"
           >
             ⬇️ Exportar
           </button>
           <button
             onClick={() => fileRef.current?.click()}
-            className="flex-1 rounded-lg border border-surface-border/60 px-2 py-1.5 text-xs text-slate-300 transition-colors hover:border-accent/50 hover:text-accent"
+            className="flex-1 rounded-lg border border-surface-border/60 px-2 py-1.5 text-xs text-fg-soft transition-colors hover:border-accent/50 hover:text-accent"
           >
             ⬆️ Importar
           </button>
@@ -128,13 +138,13 @@ export function NavBar() {
           <div className="flex gap-2">
             <button
               onClick={handleReset}
-              className="flex-1 rounded-lg bg-rose-500/15 px-2 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-500/25"
+              className="flex-1 rounded-lg bg-rose-500/15 px-2 py-1.5 text-xs font-medium text-rose-700 dark:text-rose-300 hover:bg-rose-500/25"
             >
               Sí, borrar todo
             </button>
             <button
               onClick={() => setConfirming(false)}
-              className="rounded-lg bg-slate-800 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700"
+              className="rounded-lg bg-elevated px-3 py-1.5 text-xs text-fg-soft hover:bg-control"
             >
               Cancelar
             </button>
@@ -142,14 +152,14 @@ export function NavBar() {
         ) : (
           <button
             onClick={() => setConfirming(true)}
-            className="w-full rounded-lg border border-surface-border/60 px-2 py-1.5 text-xs text-slate-400 transition-colors hover:border-rose-500/40 hover:text-rose-300"
+            className="w-full rounded-lg border border-surface-border/60 px-2 py-1.5 text-xs text-muted transition-colors hover:border-rose-500/40 hover:text-rose-700 dark:hover:text-rose-300"
           >
             ↺ Reiniciar datos
           </button>
         )}
       </div>
 
-      <p className="px-2 text-[11px] leading-relaxed text-slate-500">
+      <p className="px-2 text-[11px] leading-relaxed text-muted-2">
         UTEC · Ing. de Sistemas · Ciclo 4
         <br />
         Vacaciones hasta 10 ago 2026

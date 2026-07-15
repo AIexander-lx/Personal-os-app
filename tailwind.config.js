@@ -4,17 +4,30 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      // Tokens semánticos: los valores viven en variables CSS (globals.css)
+      // y cambian según el tema claro/oscuro.
       colors: {
         accent: {
-          DEFAULT: '#00d4ff',
+          DEFAULT: 'rgb(var(--accent) / <alpha-value>)',
           soft: '#22d3ee',
           dim: '#0891b2',
         },
         surface: {
-          DEFAULT: '#0f172a', // slate-950-ish
-          raised: '#1e293b', // slate-800
-          border: '#0f3460', // dark blue
+          DEFAULT: 'rgb(var(--bg) / <alpha-value>)',
+          raised: 'rgb(var(--bg-raised) / <alpha-value>)',
+          border: 'rgb(var(--line) / <alpha-value>)',
         },
+        fg: {
+          DEFAULT: 'rgb(var(--fg) / <alpha-value>)',
+          soft: 'rgb(var(--fg-soft) / <alpha-value>)',
+        },
+        muted: {
+          DEFAULT: 'rgb(var(--muted) / <alpha-value>)',
+          2: 'rgb(var(--muted-2) / <alpha-value>)',
+        },
+        elevated: 'rgb(var(--elevated) / <alpha-value>)',
+        control: 'rgb(var(--control) / <alpha-value>)',
+        input: 'rgb(var(--input) / <alpha-value>)',
       },
       fontFamily: {
         sans: ['Roboto', 'system-ui', 'Segoe UI', 'sans-serif'],

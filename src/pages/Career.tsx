@@ -99,18 +99,18 @@ function MetaCounter({
   const pct = Math.min(100, Math.round((value / goal) * 100))
   const reached = value >= goal
   return (
-    <div className="rounded-lg bg-slate-800/40 p-3">
+    <div className="rounded-lg bg-elevated/40 p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className="text-lg">{icon}</span>
-          <span className="text-sm text-slate-200">{label}</span>
+          <span className="text-sm text-fg">{label}</span>
         </div>
-        {reached && <span className="badge bg-emerald-500/15 text-emerald-300">¡Meta!</span>}
+        {reached && <span className="badge bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">¡Meta!</span>}
       </div>
       <div className="flex items-center gap-2">
         <button
           onClick={() => onChange(value - 1)}
-          className="h-8 w-8 shrink-0 rounded-md bg-slate-700/70 text-slate-200 hover:bg-slate-700"
+          className="h-8 w-8 shrink-0 rounded-md bg-control/70 text-fg hover:bg-control"
           aria-label="Restar"
         >
           −
@@ -120,16 +120,16 @@ function MetaCounter({
           min={0}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="w-20 rounded-lg border border-surface-border/60 bg-slate-900/60 px-2 py-1.5 text-center text-sm text-slate-200 focus:border-accent focus:outline-none"
+          className="w-20 rounded-lg border border-surface-border/60 bg-input/60 px-2 py-1.5 text-center text-sm text-fg focus:border-accent focus:outline-none"
         />
         <button
           onClick={() => onChange(value + 1)}
-          className="h-8 w-8 shrink-0 rounded-md bg-slate-700/70 text-slate-200 hover:bg-slate-700"
+          className="h-8 w-8 shrink-0 rounded-md bg-control/70 text-fg hover:bg-control"
           aria-label="Sumar"
         >
           +
         </button>
-        <span className="ml-1 text-xs text-slate-400">
+        <span className="ml-1 text-xs text-muted">
           / {goal} {suffix}
         </span>
       </div>
@@ -155,13 +155,13 @@ export default function Career() {
   return (
     <div className="space-y-6">
       <header className="animate-fade-in">
-        <h1 className="text-2xl font-bold text-slate-100 sm:text-3xl">Roadmap profesional</h1>
-        <p className="text-sm text-slate-400">Plan a 2 años · 4 fases</p>
+        <h1 className="text-2xl font-bold text-fg sm:text-3xl">Roadmap profesional</h1>
+        <p className="text-sm text-muted">Plan a 2 años · 4 fases</p>
       </header>
 
       <Card icon="🧭" title="Progreso global de carrera">
         <ProgressBar value={overall} showValue gradient="accent" />
-        <p className="mt-2 text-xs text-slate-400">
+        <p className="mt-2 text-xs text-muted">
           {completedMilestones}/{totalMilestones} hitos completados
         </p>
       </Card>
@@ -183,8 +183,8 @@ export default function Career() {
                 <Card padded className="animate-fade-in">
                   <div className="mb-3 flex items-center justify-between">
                     <div>
-                      <h3 className="font-semibold text-slate-100">{phase.name}</h3>
-                      <p className="text-xs text-slate-400">{phase.period}</p>
+                      <h3 className="font-semibold text-fg">{phase.name}</h3>
+                      <p className="text-xs text-muted">{phase.period}</p>
                     </div>
                     <span
                       className={clsx(
@@ -204,17 +204,17 @@ export default function Career() {
                         <button
                           key={key}
                           onClick={() => toggleMilestone(key)}
-                          className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm transition-colors hover:bg-slate-800/50"
+                          className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm transition-colors hover:bg-elevated/50"
                         >
                           <span
                             className={clsx(
                               'grid h-5 w-5 place-items-center rounded-md text-[11px]',
-                              done ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-800 text-slate-500',
+                              done ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' : 'bg-elevated text-muted-2',
                             )}
                           >
                             {done ? '✓' : ''}
                           </span>
-                          <span className={clsx(done ? 'text-slate-400 line-through' : 'text-slate-200')}>
+                          <span className={clsx(done ? 'text-muted line-through' : 'text-fg')}>
                             {m}
                           </span>
                         </button>
@@ -223,12 +223,12 @@ export default function Career() {
                   </div>
 
                   <div className="mt-3 border-t border-surface-border/40 pt-3">
-                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-2">
                       Skills
                     </p>
                     <div className="flex flex-wrap gap-1.5">
                       {phase.skills.map((sk) => (
-                        <span key={sk} className="badge bg-slate-800 text-slate-300">
+                        <span key={sk} className="badge bg-elevated text-fg-soft">
                           {sk}
                         </span>
                       ))}
@@ -249,7 +249,7 @@ export default function Career() {
             return (
               <label
                 key={c.id}
-                className="flex cursor-pointer items-center gap-3 rounded-lg bg-slate-800/40 p-3"
+                className="flex cursor-pointer items-center gap-3 rounded-lg bg-elevated/40 p-3"
               >
                 <input
                   type="checkbox"
@@ -258,12 +258,12 @@ export default function Career() {
                   className="h-4 w-4 accent-cyan-400"
                 />
                 <div className="flex-1">
-                  <p className={clsx('text-sm', done ? 'text-slate-400 line-through' : 'text-slate-200')}>
+                  <p className={clsx('text-sm', done ? 'text-muted line-through' : 'text-fg')}>
                     {c.name}
                   </p>
-                  <p className="text-[11px] text-slate-500">Meta: {c.target}</p>
+                  <p className="text-[11px] text-muted-2">Meta: {c.target}</p>
                 </div>
-                {done && <span className="badge bg-emerald-500/15 text-emerald-300">Obtenida</span>}
+                {done && <span className="badge bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">Obtenida</span>}
               </label>
             )
           })}

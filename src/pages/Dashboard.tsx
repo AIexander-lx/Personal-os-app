@@ -77,8 +77,8 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <header className="animate-fade-in">
-        <p className="text-sm text-slate-400">Buen día, capitán 👋</p>
-        <h1 className="text-2xl font-bold text-slate-100 sm:text-3xl">
+        <p className="text-sm text-muted">Buen día, capitán 👋</p>
+        <h1 className="text-2xl font-bold text-fg sm:text-3xl">
           Dashboard · {level.title}
         </h1>
       </header>
@@ -101,10 +101,10 @@ export default function Dashboard() {
           title="Progreso de XP"
           subtitle="Últimos 30 días (acumulado)"
           icon="📈"
-          action={<span className="badge bg-cyan-500/10 text-cyan-300">{formatXP(user.totalXP)}</span>}
+          action={<span className="badge bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">{formatXP(user.totalXP)}</span>}
         >
           <XPChart points={chart} />
-          <div className="mt-1 flex justify-between text-[10px] text-slate-500">
+          <div className="mt-1 flex justify-between text-[10px] text-muted-2">
             <span>{chart[0]?.label}</span>
             <span>hoy</span>
           </div>
@@ -119,25 +119,25 @@ export default function Dashboard() {
               showValue
               gradient="violet"
             />
-            <p className="mt-1 text-xs text-slate-400">
-              Faltan <span className="font-semibold text-slate-200">{xpToNextLevel(user.totalXP)} XP</span>
+            <p className="mt-1 text-xs text-muted">
+              Faltan <span className="font-semibold text-fg">{xpToNextLevel(user.totalXP)} XP</span>
             </p>
           </div>
           <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted">
               Logros por desbloquear
             </p>
             {nearAchievements.map((a) => (
-              <div key={a.id} className="flex items-center gap-3 rounded-lg bg-slate-800/50 p-2">
+              <div key={a.id} className="flex items-center gap-3 rounded-lg bg-elevated/50 p-2">
                 <span className="text-lg opacity-70 grayscale">{a.icon}</span>
                 <div className="min-w-0">
-                  <p className="truncate text-sm text-slate-200">{a.name}</p>
-                  <p className="truncate text-[11px] text-slate-500">{a.description}</p>
+                  <p className="truncate text-sm text-fg">{a.name}</p>
+                  <p className="truncate text-[11px] text-muted-2">{a.description}</p>
                 </div>
-                <span className="ml-auto badge bg-slate-700/60 text-slate-300">+{a.xp}</span>
+                <span className="ml-auto badge bg-control/60 text-fg-soft">+{a.xp}</span>
               </div>
             ))}
-            <p className="pt-1 text-[11px] text-slate-500">
+            <p className="pt-1 text-[11px] text-muted-2">
               {unlockedCount}/{achievements.length} logros desbloqueados
             </p>
           </div>
@@ -154,7 +154,7 @@ export default function Dashboard() {
                 <div key={c.id}>
                   <div className="mb-1 flex items-center gap-2 text-sm">
                     <span>{c.icon}</span>
-                    <span className="truncate text-slate-200">{c.name}</span>
+                    <span className="truncate text-fg">{c.name}</span>
                   </div>
                   <ProgressBar
                     value={p}
@@ -178,27 +178,27 @@ export default function Dashboard() {
               <span className="text-lg">⏱️</span>
               <div>
                 <p className="text-sm font-semibold">Iniciar sesión de estudio</p>
-                <p className="text-[11px] text-cyan-200/70">Timer Pomodoro + XP en vivo</p>
+                <p className="text-[11px] text-cyan-900 dark:text-cyan-200/70">Timer Pomodoro + XP en vivo</p>
               </div>
             </Link>
             <Link
               to="/health"
-              className="flex items-center gap-3 rounded-lg bg-slate-800/60 p-3 text-slate-200 transition-colors hover:bg-slate-800"
+              className="flex items-center gap-3 rounded-lg bg-elevated/60 p-3 text-fg transition-colors hover:bg-elevated"
             >
               <span className="text-lg">💪</span>
               <div>
                 <p className="text-sm font-semibold">Registrar gym</p>
-                <p className="text-[11px] text-slate-400">06:00–08:00 · Lun a Vie</p>
+                <p className="text-[11px] text-muted">06:00–08:00 · Lun a Vie</p>
               </div>
             </Link>
             <Link
               to="/streakstudy"
-              className="flex items-center gap-3 rounded-lg bg-slate-800/60 p-3 text-slate-200 transition-colors hover:bg-slate-800"
+              className="flex items-center gap-3 rounded-lg bg-elevated/60 p-3 text-fg transition-colors hover:bg-elevated"
             >
               <span className="text-lg">🚀</span>
               <div>
                 <p className="text-sm font-semibold">Avanzar StreakStudy</p>
-                <p className="text-[11px] text-slate-400">Features y bugs del proyecto</p>
+                <p className="text-[11px] text-muted">Features y bugs del proyecto</p>
               </div>
             </Link>
           </div>
@@ -211,7 +211,7 @@ export default function Dashboard() {
         subtitle="Desbloquéalos usando la app"
         icon="🏅"
         action={
-          <span className="badge bg-slate-700/60 text-slate-300">
+          <span className="badge bg-control/60 text-fg-soft">
             {unlockedCount}/{achievements.length}
           </span>
         }
@@ -225,7 +225,7 @@ export default function Dashboard() {
                 'flex items-center gap-2 rounded-lg border p-2.5 ' +
                 (a.unlocked
                   ? 'border-accent/30 bg-accent/5'
-                  : 'border-surface-border/40 bg-slate-800/30')
+                  : 'border-surface-border/40 bg-elevated/30')
               }
             >
               <span className={'text-xl ' + (a.unlocked ? '' : 'opacity-40 grayscale')}>
@@ -235,12 +235,12 @@ export default function Dashboard() {
                 <p
                   className={
                     'truncate text-xs font-medium ' +
-                    (a.unlocked ? 'text-slate-100' : 'text-slate-400')
+                    (a.unlocked ? 'text-fg' : 'text-muted')
                   }
                 >
                   {a.name}
                 </p>
-                <p className="text-[10px] text-slate-500">
+                <p className="text-[10px] text-muted-2">
                   {a.unlocked ? `Desbloqueado · +${a.xp}` : `+${a.xp} XP`}
                 </p>
               </div>

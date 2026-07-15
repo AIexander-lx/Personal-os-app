@@ -104,23 +104,23 @@ function TrackerColumn({ kind }: { kind: ItemKind }) {
               setDragIndex(null)
             }}
             className={clsx(
-              'group flex items-center gap-2 rounded-lg border border-surface-border/40 bg-slate-800/40 p-2.5 transition-colors',
+              'group flex items-center gap-2 rounded-lg border border-surface-border/40 bg-elevated/40 p-2.5 transition-colors',
               dragIndex === idx && 'opacity-50',
             )}
           >
-            <span className="cursor-grab text-slate-500 active:cursor-grabbing">⠿</span>
+            <span className="cursor-grab text-muted-2 active:cursor-grabbing">⠿</span>
             <input
               type="checkbox"
               checked={item.done}
               onChange={() => toggleItem(item.id)}
               className="h-4 w-4 accent-cyan-400"
             />
-            <span className={clsx('flex-1 text-sm', item.done ? 'text-slate-500 line-through' : 'text-slate-200')}>
+            <span className={clsx('flex-1 text-sm', item.done ? 'text-muted-2 line-through' : 'text-fg')}>
               {item.title}
             </span>
             <button
               onClick={() => removeItem(item.id)}
-              className="text-slate-600 opacity-0 transition-opacity hover:text-rose-400 group-hover:opacity-100"
+              className="text-muted-2 opacity-0 transition-opacity hover:text-rose-600 dark:hover:text-rose-400 group-hover:opacity-100"
               aria-label="Eliminar"
             >
               ✕
@@ -142,7 +142,7 @@ function TrackerColumn({ kind }: { kind: ItemKind }) {
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder={kind === 'feature' ? 'Nueva feature…' : 'Nuevo bug…'}
-          className="flex-1 rounded-lg border border-surface-border/60 bg-slate-900/60 px-3 py-1.5 text-sm text-slate-200 placeholder:text-slate-500 focus:border-accent focus:outline-none"
+          className="flex-1 rounded-lg border border-surface-border/60 bg-input/60 px-3 py-1.5 text-sm text-fg placeholder:text-muted-2 focus:border-accent focus:outline-none"
         />
         <button className="rounded-lg bg-accent/15 px-3 py-1.5 text-sm font-medium text-accent hover:bg-accent/25">
           +
@@ -167,23 +167,23 @@ export default function StreakStudy() {
   return (
     <div className="space-y-6">
       <header className="animate-fade-in">
-        <h1 className="text-2xl font-bold text-slate-100 sm:text-3xl">🚀 StreakStudy</h1>
-        <p className="text-sm text-slate-400">Proyecto principal · tracker de features y bugs</p>
+        <h1 className="text-2xl font-bold text-fg sm:text-3xl">🚀 StreakStudy</h1>
+        <p className="text-sm text-muted">Proyecto principal · tracker de features y bugs</p>
       </header>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2" title="Sobre el proyecto" icon="📌">
-          <p className="text-sm text-slate-300">
+          <p className="text-sm text-fg-soft">
             App de estudio con repaso espaciado (SM-2) y notificaciones channel-agnostic.
             Objetivo del roadmap: v1.0 con monetización.
           </p>
           <div className="mt-4">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted">
               Stack tecnológico
             </p>
             <div className="flex flex-wrap gap-2">
               {STACK.map((t) => (
-                <span key={t} className="badge bg-slate-800 text-slate-300">
+                <span key={t} className="badge bg-elevated text-fg-soft">
                   {t}
                 </span>
               ))}
@@ -206,7 +206,7 @@ export default function StreakStudy() {
                   onClick={() => setPhase(p)}
                   className={clsx(
                     'rounded-md px-2.5 py-1 text-xs font-medium',
-                    phase === p ? 'bg-accent/20 text-accent' : 'bg-slate-800 text-slate-400 hover:bg-slate-700',
+                    phase === p ? 'bg-accent/20 text-accent' : 'bg-elevated text-muted hover:bg-control',
                   )}
                 >
                   {p}
@@ -237,14 +237,14 @@ export default function StreakStudy() {
             value={updateDraft}
             onChange={(e) => setUpdateDraft(e.target.value)}
             placeholder="Registrar avance de hoy…"
-            className="flex-1 rounded-lg border border-surface-border/60 bg-slate-900/60 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:border-accent focus:outline-none"
+            className="flex-1 rounded-lg border border-surface-border/60 bg-input/60 px-3 py-2 text-sm text-fg placeholder:text-muted-2 focus:border-accent focus:outline-none"
           />
           <button className="rounded-lg bg-accent/15 px-4 py-2 text-sm font-medium text-accent hover:bg-accent/25">
             Añadir
           </button>
         </form>
         {updates.length === 0 && (
-          <p className="py-4 text-center text-sm text-slate-500">
+          <p className="py-4 text-center text-sm text-muted-2">
             Aún no hay avances registrados. ¡Añade el primero!
           </p>
         )}
@@ -252,8 +252,8 @@ export default function StreakStudy() {
           {updates.map((u) => (
             <li key={u.id} className="relative">
               <span className="absolute -left-[27px] top-1 h-3 w-3 rounded-full bg-accent shadow-glow" />
-              <p className="text-sm text-slate-200">{u.text}</p>
-              <p className="text-[11px] text-slate-500">{formatDate(u.date)}</p>
+              <p className="text-sm text-fg">{u.text}</p>
+              <p className="text-[11px] text-muted-2">{formatDate(u.date)}</p>
             </li>
           ))}
         </ol>

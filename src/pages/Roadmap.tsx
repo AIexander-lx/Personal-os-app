@@ -8,9 +8,9 @@ import type { Course, Difficulty, Topic } from '@/types'
 const DIFFICULTIES: Difficulty[] = ['Easy', 'Medium', 'Hard']
 
 const difficultyStyles: Record<Difficulty, string> = {
-  Easy: 'bg-emerald-500/15 text-emerald-300',
-  Medium: 'bg-amber-500/15 text-amber-300',
-  Hard: 'bg-rose-500/15 text-rose-300',
+  Easy: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
+  Medium: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
+  Hard: 'bg-rose-500/15 text-rose-700 dark:text-rose-300',
 }
 
 const statusLabel = {
@@ -20,19 +20,19 @@ const statusLabel = {
 } as const
 
 const statusStyles = {
-  'not-started': 'bg-slate-700/60 text-slate-300',
-  'in-progress': 'bg-cyan-500/15 text-cyan-300',
-  completed: 'bg-emerald-500/15 text-emerald-300',
+  'not-started': 'bg-control/60 text-fg-soft',
+  'in-progress': 'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300',
+  completed: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
 } as const
 
 const inputCls =
-  'rounded-md border border-surface-border/60 bg-slate-900/60 px-2 py-1 text-sm text-slate-200 focus:border-accent focus:outline-none'
+  'rounded-md border border-surface-border/60 bg-input/60 px-2 py-1 text-sm text-fg focus:border-accent focus:outline-none'
 
 function TopicEditRow({ courseId, topic }: { courseId: string; topic: Topic }) {
   const updateTopic = useCourseStore((s) => s.updateTopic)
   const removeTopic = useCourseStore((s) => s.removeTopic)
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-lg bg-slate-800/40 p-2">
+    <div className="flex flex-wrap items-center gap-2 rounded-lg bg-elevated/40 p-2">
       <input
         value={topic.name}
         onChange={(e) => updateTopic(courseId, topic.id, { name: e.target.value })}
@@ -51,7 +51,7 @@ function TopicEditRow({ courseId, topic }: { courseId: string; topic: Topic }) {
           </option>
         ))}
       </select>
-      <label className="flex items-center gap-1 text-[11px] text-slate-400">
+      <label className="flex items-center gap-1 text-[11px] text-muted">
         ej.
         <input
           type="number"
@@ -61,7 +61,7 @@ function TopicEditRow({ courseId, topic }: { courseId: string; topic: Topic }) {
           className={clsx(inputCls, 'w-14')}
         />
       </label>
-      <label className="flex items-center gap-1 text-[11px] text-slate-400">
+      <label className="flex items-center gap-1 text-[11px] text-muted">
         XP
         <input
           type="number"
@@ -73,7 +73,7 @@ function TopicEditRow({ courseId, topic }: { courseId: string; topic: Topic }) {
       </label>
       <button
         onClick={() => removeTopic(courseId, topic.id)}
-        className="ml-auto text-slate-500 hover:text-rose-400"
+        className="ml-auto text-muted-2 hover:text-rose-600 dark:hover:text-rose-400"
         aria-label="Eliminar tema"
       >
         ✕
@@ -166,12 +166,12 @@ function CourseCard({ course }: { course: Course }) {
             onClick={() => setOpen((v) => !v)}
             className="flex min-w-0 items-center gap-3 text-left"
           >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-slate-800 text-xl">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-elevated text-xl">
               {course.icon}
             </span>
             <div className="min-w-0">
-              <h3 className="truncate font-semibold text-slate-100">{course.name}</h3>
-              <p className="truncate text-xs text-slate-400">{course.description}</p>
+              <h3 className="truncate font-semibold text-fg">{course.name}</h3>
+              <p className="truncate text-xs text-muted">{course.description}</p>
             </div>
           </button>
           <div className="flex shrink-0 items-center gap-2">
@@ -180,7 +180,7 @@ function CourseCard({ course }: { course: Course }) {
               onClick={toggleEdit}
               className={clsx(
                 'badge transition-colors',
-                editing ? 'bg-accent/20 text-accent' : 'bg-slate-700/60 text-slate-300 hover:text-accent',
+                editing ? 'bg-accent/20 text-accent' : 'bg-control/60 text-fg-soft hover:text-accent',
               )}
               aria-label="Editar curso"
             >
@@ -191,7 +191,7 @@ function CourseCard({ course }: { course: Course }) {
 
         <div className="mt-4">
           <ProgressBar value={progress} showValue gradient={progress >= 100 ? 'green' : 'accent'} />
-          <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
+          <div className="mt-2 flex items-center justify-between text-xs text-muted">
             <span>
               {course.topics.length} temas · {totalExercises} ejercicios
             </span>
@@ -203,9 +203,9 @@ function CourseCard({ course }: { course: Course }) {
       </div>
 
       {expanded && (
-        <div className="animate-fade-in space-y-2 border-t border-surface-border/50 bg-slate-900/40 p-4">
+        <div className="animate-fade-in space-y-2 border-t border-surface-border/50 bg-elevated/60 p-4">
           {editing && (
-            <div className="space-y-2 rounded-lg border border-accent/20 bg-slate-800/40 p-3">
+            <div className="space-y-2 rounded-lg border border-accent/20 bg-elevated/40 p-3">
               <div className="flex gap-2">
                 <input
                   value={course.icon}
@@ -231,13 +231,13 @@ function CourseCard({ course }: { course: Course }) {
                 <div className="flex gap-2">
                   <button
                     onClick={() => removeCourse(course.id)}
-                    className="flex-1 rounded-md bg-rose-500/15 px-2 py-1.5 text-xs font-medium text-rose-300 hover:bg-rose-500/25"
+                    className="flex-1 rounded-md bg-rose-500/15 px-2 py-1.5 text-xs font-medium text-rose-700 dark:text-rose-300 hover:bg-rose-500/25"
                   >
                     Sí, eliminar curso
                   </button>
                   <button
                     onClick={() => setConfirmDel(false)}
-                    className="rounded-md bg-slate-800 px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-700"
+                    className="rounded-md bg-elevated px-3 py-1.5 text-xs text-fg-soft hover:bg-control"
                   >
                     Cancelar
                   </button>
@@ -245,7 +245,7 @@ function CourseCard({ course }: { course: Course }) {
               ) : (
                 <button
                   onClick={() => setConfirmDel(true)}
-                  className="text-xs text-slate-400 hover:text-rose-300"
+                  className="text-xs text-muted hover:text-rose-700 dark:hover:text-rose-300"
                 >
                   🗑 Eliminar curso
                 </button>
@@ -258,36 +258,36 @@ function CourseCard({ course }: { course: Course }) {
             const done = t.completedExercises ?? 0
             const tp = topicProgress(t)
             return (
-              <div key={t.id} className="rounded-lg bg-slate-800/40 p-3">
+              <div key={t.id} className="rounded-lg bg-elevated/40 p-3">
                 <div className="flex items-center justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-slate-200">{t.name}</p>
+                    <p className="truncate text-sm font-medium text-fg">{t.name}</p>
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px]">
                       <span className={clsx('badge', difficultyStyles[t.difficulty])}>{t.difficulty}</span>
-                      <span className="text-slate-400">
+                      <span className="text-muted">
                         {done}/{t.exercises} ejercicios
                       </span>
-                      <span className="text-cyan-300">+{t.xp} XP</span>
+                      <span className="text-cyan-700 dark:text-cyan-300">+{t.xp} XP</span>
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-1">
                     <button
                       onClick={() => incrementTopic(course.id, t.id, -1)}
-                      className="h-7 w-7 rounded-md bg-slate-700/70 text-slate-200 hover:bg-slate-700"
+                      className="h-7 w-7 rounded-md bg-control/70 text-fg hover:bg-control"
                       aria-label="Restar ejercicio"
                     >
                       −
                     </button>
                     <button
                       onClick={() => incrementTopic(course.id, t.id, 1)}
-                      className="h-7 w-7 rounded-md bg-slate-700/70 text-slate-200 hover:bg-slate-700"
+                      className="h-7 w-7 rounded-md bg-control/70 text-fg hover:bg-control"
                       aria-label="Sumar ejercicio"
                     >
                       +
                     </button>
                     <button
                       onClick={() => completeTopic(course.id, t.id)}
-                      className="h-7 rounded-md bg-emerald-500/15 px-2 text-xs text-emerald-300 hover:bg-emerald-500/25"
+                      className="h-7 rounded-md bg-emerald-500/15 px-2 text-xs text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/25"
                     >
                       ✓
                     </button>
@@ -300,7 +300,7 @@ function CourseCard({ course }: { course: Course }) {
 
           {editing && <AddTopicForm courseId={course.id} />}
           {!editing && course.topics.length === 0 && (
-            <p className="py-3 text-center text-xs text-slate-500">
+            <p className="py-3 text-center text-xs text-muted-2">
               Sin temas. Pulsa ✏️ para agregar.
             </p>
           )}
@@ -353,7 +353,7 @@ function AddCourseForm({ onDone }: { onDone: () => void }) {
           <button
             type="button"
             onClick={onDone}
-            className="rounded-lg bg-slate-800 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700"
+            className="rounded-lg bg-elevated px-3 py-2 text-sm text-fg-soft hover:bg-control"
           >
             Cancelar
           </button>
@@ -392,8 +392,8 @@ export default function Roadmap() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3 animate-fade-in">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 sm:text-3xl">Roadmap académico</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-2xl font-bold text-fg sm:text-3xl">Roadmap académico</h1>
+          <p className="text-sm text-muted">
             {courses.length} cursos · {totalTopics} temas · {totalExercises} ejercicios
           </p>
         </div>
@@ -406,7 +406,7 @@ export default function Roadmap() {
           </button>
           <button
             onClick={() => resetCourses()}
-            className="rounded-lg border border-surface-border/60 px-3 py-2 text-xs text-slate-400 hover:text-rose-300"
+            className="rounded-lg border border-surface-border/60 px-3 py-2 text-xs text-muted hover:text-rose-700 dark:hover:text-rose-300"
             title="Restaurar los cursos originales de UTEC"
           >
             ↺ Restaurar
@@ -422,12 +422,12 @@ export default function Roadmap() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="🔍 Buscar curso o tema…"
-            className="w-full rounded-lg border border-surface-border/60 bg-slate-900/60 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-500 focus:border-accent focus:outline-none sm:max-w-xs"
+            className="w-full rounded-lg border border-surface-border/60 bg-input/60 px-3 py-2 text-sm text-fg placeholder:text-muted-2 focus:border-accent focus:outline-none sm:max-w-xs"
           />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-            className="rounded-lg border border-surface-border/60 bg-slate-900/60 px-3 py-2 text-sm text-slate-200 focus:border-accent focus:outline-none"
+            className="rounded-lg border border-surface-border/60 bg-input/60 px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none"
           >
             <option value="all">Todos los estados</option>
             <option value="not-started">No iniciado</option>
@@ -437,7 +437,7 @@ export default function Roadmap() {
           <select
             value={difficultyFilter}
             onChange={(e) => setDifficultyFilter(e.target.value as typeof difficultyFilter)}
-            className="rounded-lg border border-surface-border/60 bg-slate-900/60 px-3 py-2 text-sm text-slate-200 focus:border-accent focus:outline-none"
+            className="rounded-lg border border-surface-border/60 bg-input/60 px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none"
           >
             <option value="all">Toda dificultad</option>
             <option value="Easy">Easy</option>
@@ -453,7 +453,7 @@ export default function Roadmap() {
         ))}
       </div>
       {filtered.length === 0 && (
-        <p className="py-10 text-center text-sm text-slate-500">
+        <p className="py-10 text-center text-sm text-muted-2">
           No hay cursos que coincidan con los filtros.
         </p>
       )}

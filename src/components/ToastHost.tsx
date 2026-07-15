@@ -20,7 +20,7 @@ function ToastCard({ toast }: { toast: Toast }) {
       </span>
       <div className="min-w-0">
         <p className="text-sm font-semibold text-accent">{toast.title}</p>
-        <p className="truncate text-xs text-slate-300">{toast.description}</p>
+        <p className="truncate text-xs text-fg-soft">{toast.description}</p>
       </div>
     </div>
   )

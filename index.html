@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es" class="dark">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,6 +12,23 @@
   </head>
   <body>
     <div id="root"></div>
+    <!--
+      Aplica el tema antes del primer render para evitar el flash de tema
+      incorrecto (FOUC). Lee la misma clave que persiste el themeStore.
+    -->
+    <script>
+      (function () {
+        try {
+          var saved = JSON.parse(localStorage.getItem('theme-store') || 'null')
+          var theme =
+            (saved && saved.state && saved.state.theme) ||
+            (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+          document.documentElement.classList.toggle('dark', theme === 'dark')
+        } catch (e) {
+          document.documentElement.classList.add('dark')
+        }
+      })()
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

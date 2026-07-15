@@ -160,8 +160,8 @@ export default function Study() {
   return (
     <div className="space-y-6">
       <header className="animate-fade-in">
-        <h1 className="text-2xl font-bold text-slate-100 sm:text-3xl">Sesiones de estudio</h1>
-        <p className="text-sm text-slate-400">Timer Pomodoro · cálculo de XP en vivo</p>
+        <h1 className="text-2xl font-bold text-fg sm:text-3xl">Sesiones de estudio</h1>
+        <p className="text-sm text-muted">Timer Pomodoro · cálculo de XP en vivo</p>
       </header>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -186,10 +186,10 @@ export default function Study() {
                   />
                 </svg>
                 <div className="absolute text-center">
-                  <div className="font-mono text-4xl font-bold text-slate-100">
+                  <div className="font-mono text-4xl font-bold text-fg">
                     {formatClock(remaining)}
                   </div>
-                  <div className="text-xs text-slate-400">
+                  <div className="text-xs text-muted">
                     {running ? 'en curso…' : 'listo'}
                   </div>
                 </div>
@@ -204,13 +204,13 @@ export default function Study() {
                 </button>
                 <button
                   onClick={resetTimer}
-                  className="rounded-lg bg-slate-800 px-4 py-2 font-semibold text-slate-200 hover:bg-slate-700"
+                  className="rounded-lg bg-elevated px-4 py-2 font-semibold text-fg hover:bg-control"
                 >
                   ↺ Reset
                 </button>
                 <button
                   onClick={complete}
-                  className="rounded-lg bg-emerald-500/15 px-4 py-2 font-semibold text-emerald-300 hover:bg-emerald-500/25"
+                  className="rounded-lg bg-emerald-500/15 px-4 py-2 font-semibold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/25"
                   title="Marcar sesión como completada"
                 >
                   ✓ Completar
@@ -220,11 +220,11 @@ export default function Study() {
 
             <div className="space-y-4">
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-400">Curso</label>
+                <label className="mb-1 block text-xs font-medium text-muted">Curso</label>
                 <select
                   value={courseId}
                   onChange={(e) => setCourseId(e.target.value)}
-                  className="w-full rounded-lg border border-surface-border/60 bg-slate-900/60 px-3 py-2 text-sm text-slate-200 focus:border-accent focus:outline-none"
+                  className="w-full rounded-lg border border-surface-border/60 bg-input/60 px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none"
                 >
                   {courses.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -234,11 +234,11 @@ export default function Study() {
                 </select>
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-400">Tema</label>
+                <label className="mb-1 block text-xs font-medium text-muted">Tema</label>
                 <select
                   value={topicId}
                   onChange={(e) => setTopicId(e.target.value)}
-                  className="w-full rounded-lg border border-surface-border/60 bg-slate-900/60 px-3 py-2 text-sm text-slate-200 focus:border-accent focus:outline-none"
+                  className="w-full rounded-lg border border-surface-border/60 bg-input/60 px-3 py-2 text-sm text-fg focus:border-accent focus:outline-none"
                 >
                   {selectedCourse?.topics.map((t) => (
                     <option key={t.id} value={t.id}>
@@ -248,7 +248,7 @@ export default function Study() {
                 </select>
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-400">Duración</label>
+                <label className="mb-1 block text-xs font-medium text-muted">Duración</label>
                 <div className="flex flex-wrap gap-2">
                   {PRESETS.map((m) => (
                     <button
@@ -258,7 +258,7 @@ export default function Study() {
                         'rounded-lg px-3 py-1.5 text-sm font-medium ' +
                         (minutes === m
                           ? 'bg-accent/20 text-accent'
-                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700')
+                          : 'bg-elevated text-fg-soft hover:bg-control')
                       }
                     >
                       {m} min
@@ -271,11 +271,11 @@ export default function Study() {
                       max={240}
                       value={customMinutes}
                       onChange={(e) => setCustomMinutes(Number(e.target.value))}
-                      className="w-16 rounded-lg border border-surface-border/60 bg-slate-900/60 px-2 py-1.5 text-sm text-slate-200 focus:border-accent focus:outline-none"
+                      className="w-16 rounded-lg border border-surface-border/60 bg-input/60 px-2 py-1.5 text-sm text-fg focus:border-accent focus:outline-none"
                     />
                     <button
                       onClick={() => setPreset(Math.max(1, customMinutes))}
-                      className="rounded-lg bg-slate-800 px-2 py-1.5 text-sm text-slate-300 hover:bg-slate-700"
+                      className="rounded-lg bg-elevated px-2 py-1.5 text-sm text-fg-soft hover:bg-control"
                     >
                       set
                     </button>
@@ -283,11 +283,11 @@ export default function Study() {
                 </div>
               </div>
               <div className="rounded-lg bg-cyan-500/10 p-3">
-                <p className="text-xs text-cyan-200/80">XP proyectado (al completar)</p>
-                <p className="text-2xl font-bold text-cyan-300">
+                <p className="text-xs text-cyan-900 dark:text-cyan-200/80">XP proyectado (al completar)</p>
+                <p className="text-2xl font-bold text-cyan-700 dark:text-cyan-300">
                   +{projectedXP} XP
                 </p>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] text-muted">
                   50 base + {minutes} × 0.5 bonus
                 </p>
               </div>
@@ -295,16 +295,16 @@ export default function Study() {
               {notifPerm === 'default' && (
                 <button
                   onClick={requestNotifications}
-                  className="w-full rounded-lg border border-surface-border/60 px-3 py-1.5 text-xs text-slate-300 transition-colors hover:border-accent/50 hover:text-accent"
+                  className="w-full rounded-lg border border-surface-border/60 px-3 py-1.5 text-xs text-fg-soft transition-colors hover:border-accent/50 hover:text-accent"
                 >
                   🔔 Activar notificaciones al terminar
                 </button>
               )}
               {notifPerm === 'granted' && (
-                <p className="text-[11px] text-emerald-300/80">🔔 Notificaciones activas</p>
+                <p className="text-[11px] text-emerald-700/90 dark:text-emerald-300/80">🔔 Notificaciones activas</p>
               )}
               {notifPerm === 'denied' && (
-                <p className="text-[11px] text-slate-500">
+                <p className="text-[11px] text-muted-2">
                   🔕 Notificaciones bloqueadas en el navegador
                 </p>
               )}
@@ -312,7 +312,7 @@ export default function Study() {
           </div>
 
           {lastReward && (
-            <div className="mt-4 animate-fade-in rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-200">
+            <div className="mt-4 animate-fade-in rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-800 dark:text-emerald-200">
               🎉 ¡Sesión completada! <strong>+{lastReward.xp} XP</strong> en {lastReward.topic}.
             </div>
           )}
@@ -329,7 +329,7 @@ export default function Study() {
       {/* Historial */}
       <Card title="Historial de sesiones" subtitle="Últimas 10" icon="🕑">
         {sessions.length === 0 ? (
-          <p className="py-6 text-center text-sm text-slate-500">
+          <p className="py-6 text-center text-sm text-muted-2">
             Aún no hay sesiones. ¡Inicia el timer para registrar la primera!
           </p>
         ) : (
@@ -337,14 +337,14 @@ export default function Study() {
             {sessions.slice(0, 10).map((s) => (
               <div key={s.id} className="flex items-center justify-between gap-3 py-2.5">
                 <div className="min-w-0">
-                  <p className="truncate text-sm text-slate-200">{s.topicName}</p>
-                  <p className="truncate text-[11px] text-slate-500">
+                  <p className="truncate text-sm text-fg">{s.topicName}</p>
+                  <p className="truncate text-[11px] text-muted-2">
                     {s.courseName} · {formatDateTime(s.date)}
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-3 text-xs">
-                  <span className="text-slate-400">{formatDuration(s.duration)}</span>
-                  <span className="badge bg-cyan-500/10 text-cyan-300">+{s.xp} XP</span>
+                  <span className="text-muted">{formatDuration(s.duration)}</span>
+                  <span className="badge bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">+{s.xp} XP</span>
                 </div>
               </div>
             ))}

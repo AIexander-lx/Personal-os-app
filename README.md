@@ -29,6 +29,11 @@ Aplicación **100% frontend** (sin backend) que centraliza el seguimiento de est
 - **XP por sesión** = `50 base + 0.5 × minutos` (más bonos por logros).
 - **12 logros desbloqueables** con lógica real (primera sesión, rachas, cursos al 100%, *Perfect Day*, etc.) y **notificaciones (toast)** al desbloquear.
 
+### 🎨 Temas
+- **Claro y oscuro** con toggle en la barra lateral; respeta la preferencia del sistema en el primer arranque y recuerda tu elección.
+- Construido sobre **tokens semánticos** (variables CSS) en vez de colores fijos, así que ambos temas salen de una sola fuente de verdad.
+- Contraste **verificado WCAG AA** (≥4.5:1) en las 6 páginas y en ambos temas.
+
 ### 📱 PWA
 - **Instalable** en escritorio y móvil (manifest + service worker vía `vite-plugin-pwa`), funciona offline gracias al precacheo.
 - **Notificaciones** del navegador al terminar una sesión de estudio (con permiso del usuario).
@@ -44,7 +49,7 @@ Aplicación **100% frontend** (sin backend) que centraliza el seguimiento de est
 
 - **React 18** + **TypeScript**
 - **Vite** (dev server y build)
-- **Tailwind CSS** (dark mode)
+- **Tailwind CSS** con tokens semánticos vía variables CSS (tema claro/oscuro)
 - **Zustand** + `persist` middleware (estado global → `localStorage`)
 - **React Router v6**
 - **date-fns**, **clsx**
@@ -106,6 +111,7 @@ Los temas de **AED** y **Sistemas Computacionales** están alineados con el síl
 - [x] Respaldo export/import en JSON
 - [x] Tests con Vitest
 - [x] PWA instalable + notificaciones del timer
+- [x] Tema claro/oscuro con contraste AA
 - [ ] Backend (Spring Boot + PostgreSQL)
 - [ ] Sincronización multi-dispositivo (AWS)
 - [ ] Autenticación

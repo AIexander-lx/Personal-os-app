@@ -29,7 +29,7 @@ function BarChart({
     <div className="flex h-40 items-end gap-2">
       {data.map((d, i) => (
         <div key={i} className="flex flex-1 flex-col items-center gap-1">
-          <span className="text-[10px] text-slate-400">{d.value || ''}</span>
+          <span className="text-[10px] text-muted">{d.value || ''}</span>
           <div className="flex w-full flex-1 items-end">
             <div
               className={clsx('w-full rounded-t-md transition-all duration-500', color)}
@@ -37,7 +37,7 @@ function BarChart({
               title={`${d.value} ${unit}`}
             />
           </div>
-          <span className="text-[10px] text-slate-500">{d.label}</span>
+          <span className="text-[10px] text-muted-2">{d.label}</span>
         </div>
       ))}
     </div>
@@ -122,8 +122,8 @@ export default function Health() {
   return (
     <div className="space-y-6">
       <header className="animate-fade-in">
-        <h1 className="text-2xl font-bold text-slate-100 sm:text-3xl">Salud & energía</h1>
-        <p className="text-sm text-slate-400">Gym 06:00–08:00 · sueño · energía</p>
+        <h1 className="text-2xl font-bold text-fg sm:text-3xl">Salud & energía</h1>
+        <p className="text-sm text-muted">Gym 06:00–08:00 · sueño · energía</p>
       </header>
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -147,16 +147,16 @@ export default function Health() {
                 onClick={() => toggleGym(key)}
                 className={clsx(
                   'flex flex-col items-center gap-1 rounded-lg border p-2 text-center transition-colors',
-                  weekend && 'cursor-not-allowed border-surface-border/30 bg-slate-900/30 opacity-50',
+                  weekend && 'cursor-not-allowed border-surface-border/30 bg-elevated/40 opacity-50',
                   !weekend && done && 'border-emerald-500/40 bg-emerald-500/15',
-                  !weekend && !done && 'border-surface-border/50 bg-slate-800/40 hover:bg-slate-800',
+                  !weekend && !done && 'border-surface-border/50 bg-elevated/40 hover:bg-elevated',
                   isToday && 'ring-1 ring-accent',
                 )}
               >
-                <span className="text-[10px] uppercase text-slate-400">
+                <span className="text-[10px] uppercase text-muted">
                   {format(d, 'EEE', { locale: es })}
                 </span>
-                <span className="text-sm font-semibold text-slate-200">{format(d, 'd')}</span>
+                <span className="text-sm font-semibold text-fg">{format(d, 'd')}</span>
                 <span className="text-lg">{weekend ? '🌙' : done ? '✅' : '⬜'}</span>
               </button>
             )
@@ -177,7 +177,7 @@ export default function Health() {
               logSleep(todayKeyStr, sleepHours, sleepQuality)
             }}
           >
-            <label className="text-xs text-slate-400">
+            <label className="text-xs text-muted">
               Horas
               <input
                 type="number"
@@ -186,11 +186,11 @@ export default function Health() {
                 max={14}
                 value={sleepHours}
                 onChange={(e) => setSleepHours(Number(e.target.value))}
-                className="mt-1 block w-20 rounded-lg border border-surface-border/60 bg-slate-900/60 px-2 py-1.5 text-sm text-slate-200 focus:border-accent focus:outline-none"
+                className="mt-1 block w-20 rounded-lg border border-surface-border/60 bg-input/60 px-2 py-1.5 text-sm text-fg focus:border-accent focus:outline-none"
               />
             </label>
-            <label className="text-xs text-slate-400">
-              Calidad: <span className="text-slate-200">{sleepQuality}/10</span>
+            <label className="text-xs text-muted">
+              Calidad: <span className="text-fg">{sleepQuality}/10</span>
               <input
                 type="range"
                 min={1}
@@ -200,7 +200,7 @@ export default function Health() {
                 className="mt-2 block w-40 accent-violet-400"
               />
             </label>
-            <button className="rounded-lg bg-violet-500/15 px-3 py-1.5 text-sm font-medium text-violet-300 hover:bg-violet-500/25">
+            <button className="rounded-lg bg-violet-500/15 px-3 py-1.5 text-sm font-medium text-violet-700 dark:text-violet-300 hover:bg-violet-500/25">
               Guardar hoy
             </button>
           </form>
@@ -209,7 +209,7 @@ export default function Health() {
         <Card title="Energía" subtitle="Últimos 7 días (1–10)" icon="⚡">
           <BarChart data={energyData} max={10} unit="/10" color="bg-gradient-to-t from-cyan-500 to-blue-400" />
           <div className="mt-4">
-            <p className="mb-2 text-xs text-slate-400">¿Cómo te sientes hoy?</p>
+            <p className="mb-2 text-xs text-muted">¿Cómo te sientes hoy?</p>
             <div className="flex flex-wrap gap-1.5">
               {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
                 <button
@@ -219,7 +219,7 @@ export default function Health() {
                     'h-9 w-9 rounded-lg text-sm font-medium transition-colors',
                     todayEnergy === n
                       ? 'bg-accent/25 text-accent ring-1 ring-accent'
-                      : 'bg-slate-800 text-slate-400 hover:bg-slate-700',
+                      : 'bg-elevated text-muted hover:bg-control',
                   )}
                 >
                   {n}

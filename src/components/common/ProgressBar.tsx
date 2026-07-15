@@ -31,13 +31,13 @@ export function ProgressBar({
     <div className={className}>
       {(label || showValue) && (
         <div className="mb-1 flex items-center justify-between text-xs">
-          {label && <span className="text-slate-400">{label}</span>}
+          {label && <span className="text-muted">{label}</span>}
           {showValue && (
-            <span className="font-semibold text-slate-200">{Math.round(pct)}%</span>
+            <span className="font-semibold text-fg">{Math.round(pct)}%</span>
           )}
         </div>
       )}
-      <div className={clsx('w-full overflow-hidden rounded-full bg-slate-800', heights[size])}>
+      <div className={clsx('w-full overflow-hidden rounded-full bg-elevated', heights[size])}>
         <div
           className={clsx(
             'h-full rounded-full bg-gradient-to-r transition-[width] duration-700 ease-out',

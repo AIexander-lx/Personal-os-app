@@ -30,12 +30,12 @@ export function Card({
             {icon && <span className="text-xl leading-none">{icon}</span>}
             <div>
               {title && (
-                <h3 className="text-sm font-semibold tracking-wide text-slate-100">
+                <h3 className="text-sm font-semibold tracking-wide text-fg">
                   {title}
                 </h3>
               )}
               {subtitle && (
-                <p className="text-xs text-slate-400">{subtitle}</p>
+                <p className="text-xs text-muted">{subtitle}</p>
               )}
             </div>
           </div>
