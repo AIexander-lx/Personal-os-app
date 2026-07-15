@@ -7,6 +7,7 @@
 ![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?logo=vite&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38BDF8?logo=tailwindcss&logoColor=white)
 ![Zustand](https://img.shields.io/badge/Zustand-4.5-1e293b)
+![Tests](https://img.shields.io/badge/tests-39%20passing-brightgreen?logo=vitest&logoColor=white)
 
 Aplicación **100% frontend** (sin backend) que centraliza el seguimiento de estudio, salud y objetivos de carrera con un sistema de niveles, XP y logros. Todos los datos se guardan automáticamente en el navegador (`localStorage`) y se pueden respaldar/restaurar en JSON.
 
@@ -60,7 +61,12 @@ npm run build
 
 # Previsualizar el build
 npm run preview
+
+# Ejecutar los tests
+npm test
 ```
+
+Los tests (Vitest + jsdom) cubren la lógica de gamificación (XP, niveles, logros), los formateadores y el CRUD de los stores (sesiones, cursos/temas, horario) — **39 tests**.
 
 La app corre en `http://localhost:5173` (o el puerto que asigne Vite).
 
@@ -92,7 +98,9 @@ Los temas de **AED** y **Sistemas Computacionales** están alineados con el síl
 - [x] MVP frontend con persistencia local
 - [x] Gamificación (niveles, XP, logros con toast)
 - [x] Bloque de día en vivo
+- [x] Horario y cursos editables
 - [x] Respaldo export/import en JSON
+- [x] Tests con Vitest
 - [ ] Backend (Spring Boot + PostgreSQL)
 - [ ] Sincronización multi-dispositivo (AWS)
 - [ ] Autenticación
