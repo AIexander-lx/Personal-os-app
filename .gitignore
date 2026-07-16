@@ -8,5 +8,9 @@ dev-dist
 .env.*
 !.env.example
 *.log
+
+# Configuración local de editores/herramientas
 .vscode/*
 !.vscode/extensions.json
+.idea
+.claude
