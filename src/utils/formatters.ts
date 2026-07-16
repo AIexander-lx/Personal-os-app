@@ -46,3 +46,16 @@ export function formatXP(xp: number): string {
 }
 
 export const todayKey = (): string => format(new Date(), 'yyyy-MM-dd')
+
+/**
+ * Día local (yyyy-MM-dd) de una fecha ISO.
+ * Ojo: NO usar `iso.slice(0, 10)` — eso da el día en UTC, que en Perú (UTC-5)
+ * se adelanta a partir de las 19:00 locales y rompe las comparaciones con `todayKey()`.
+ */
+export function localDayKey(iso: string): string {
+  try {
+    return format(parseISO(iso), 'yyyy-MM-dd')
+  } catch {
+    return iso.slice(0, 10)
+  }
+}

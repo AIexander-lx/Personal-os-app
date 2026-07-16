@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatClock, formatDuration, formatXP } from './formatters'
+import { formatClock, formatDuration, formatXP, localDayKey, todayKey } from './formatters'
 
 describe('formatClock', () => {
   it('formatea segundos como mm:ss con padding', () => {
@@ -34,5 +34,24 @@ describe('formatXP', () => {
     const out = formatXP(1250)
     expect(out).toContain('XP')
     expect(out).toMatch(/1.?250/) // separador de miles según locale
+  })
+})
+
+describe('localDayKey', () => {
+  it('devuelve el día LOCAL, no el UTC (regresión: sesiones de noche)', () => {
+    // Una sesión "de hoy" a las 22:00 locales: en UTC-5 su ISO cae en el día
+    // siguiente. `slice(0,10)` daría mañana; localDayKey debe dar hoy.
+    const nightSession = new Date()
+    nightSession.setHours(22, 0, 0, 0)
+    const iso = nightSession.toISOString()
+    expect(localDayKey(iso)).toBe(todayKey())
+  })
+
+  it('coincide con la fecha local en cualquier momento del día', () => {
+    for (const h of [0, 6, 12, 19, 23]) {
+      const d = new Date()
+      d.setHours(h, 30, 0, 0)
+      expect(localDayKey(d.toISOString())).toBe(todayKey())
+    }
   })
 })

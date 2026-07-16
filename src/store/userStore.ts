@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { StudySession, GymEntry, SleepEntry, EnergyEntry, User } from '@/types'
-import { sessionXP, getLevelInfo, todayKey } from '@/utils'
+import { sessionXP, getLevelInfo, todayKey, localDayKey } from '@/utils'
 import { differenceInCalendarDays, parseISO } from 'date-fns'
 
 interface UserState {
@@ -43,7 +43,7 @@ const initialUser: User = {
 /** Recalcula la racha de estudio a partir de las fechas de sesión. */
 function computeStreak(sessions: StudySession[], seed: number): number {
   if (sessions.length === 0) return seed
-  const days = new Set(sessions.map((s) => s.date.slice(0, 10)))
+  const days = new Set(sessions.map((s) => localDayKey(s.date)))
   const sorted = [...days].sort().reverse()
   let streak = 0
   let cursor = new Date()

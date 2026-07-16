@@ -5,7 +5,7 @@ import { achievements as seedAchievements } from '@/data/achievements'
 import { useUserStore } from './userStore'
 import { useCourseStore } from './courseStore'
 import { useToastStore } from './toastStore'
-import { courseProgress, todayKey } from '@/utils'
+import { courseProgress, todayKey, localDayKey } from '@/utils'
 
 interface GamificationState {
   achievements: AchievementState[]
@@ -40,7 +40,7 @@ export const useGamificationStore = create<GamificationState>()(
         // Perfect Day: gym + estudio + salud registrados hoy.
         const today = todayKey()
         const gymToday = gym.some((g) => g.date === today && g.done)
-        const studyToday = sessions.some((s) => s.date.slice(0, 10) === today)
+        const studyToday = sessions.some((s) => localDayKey(s.date) === today)
         const healthToday =
           sleep.some((s) => s.date === today) || energy.some((e) => e.date === today)
         const perfectDay = gymToday && studyToday && healthToday

@@ -9,6 +9,7 @@ import {
   xpToNextLevel,
   formatXP,
   courseProgress,
+  localDayKey,
 } from '@/utils'
 import { subDays, format, parseISO, isAfter } from 'date-fns'
 
@@ -64,7 +65,7 @@ export default function Dashboard() {
     return days.map((d) => {
       const key = format(d, 'yyyy-MM-dd')
       const dayXP = inWindow
-        .filter((s) => s.date.slice(0, 10) === key)
+        .filter((s) => localDayKey(s.date) === key)
         .reduce((s, x) => s + x.xp, 0)
       cumulative += dayXP
       return { label: format(d, 'd/M'), value: cumulative }
