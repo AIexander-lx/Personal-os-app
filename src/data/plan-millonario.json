@@ -1,0 +1,123 @@
+{
+  "plan": "Plan Millonario",
+  "version": 1,
+  "createdAt": "2026-10-13",
+  "rules": [
+    "Págate primero: 20-30% de cada ingreso al S&P 500 apenas llega",
+    "El S&P 500 no se toca para reponer pérdidas del trading",
+    "Trading solo en demo hasta 30 operaciones registradas con reglas",
+    "El POS se trabaja solo en el bloque del jueves hasta el primer cliente pagado",
+    "Sin frentes nuevos (dropshipping) en estos 90 días",
+    "Notas al día, sueño de al menos 6.5 horas y futsal sin falta"
+  ],
+  "goals": [
+    {
+      "id": "g90",
+      "horizon": "90d",
+      "deadline": "2027-01-10",
+      "title": "Primer cliente pagado y entregado",
+      "checklist": [
+        { "id": "g90-1", "text": "2 proyectos de muestra publicados en GitHub y portafolio", "done": false },
+        { "id": "g90-2", "text": "LinkedIn y GitHub actualizados", "done": false },
+        { "id": "g90-3", "text": "RUC tramitado en SUNAT", "done": false },
+        { "id": "g90-4", "text": "20 negocios contactados y 5 propuestas enviadas", "done": false },
+        { "id": "g90-5", "text": "Primer cliente pagado, entregado y con mantenimiento ofrecido", "done": false },
+        { "id": "g90-6", "text": "30 operaciones en demo registradas en el diario", "done": false },
+        { "id": "g90-7", "text": "Regla del 20-30% aplicada a cada ingreso", "done": false },
+        { "id": "g90-8", "text": "3 libros leídos", "done": false },
+        { "id": "g90-9", "text": "Ciclo aprobado con buenas notas", "done": false }
+      ]
+    },
+    {
+      "id": "g1y",
+      "horizon": "1y",
+      "deadline": "2027-10-13",
+      "title": "Negocio de servicios con ingresos recurrentes",
+      "targets": [
+        { "metric": "Clientes atendidos", "target": "5 a 8" },
+        { "metric": "Clientes con mantenimiento mensual", "target": "3 o más" },
+        { "metric": "Ingreso promedio mensual (PEN)", "target": "1500 a 2000" },
+        { "metric": "Producto propio", "target": "Primera versión usada por clientes reales" },
+        { "metric": "Trading", "target": "Reglas escritas y 100+ operaciones registradas" }
+      ]
+    },
+    {
+      "id": "g3y",
+      "horizon": "3y",
+      "deadline": "2029-12-31",
+      "title": "Producto con clientes que pagan cada mes u oferta laboral fuerte",
+      "targets": [{ "metric": "Inversión acumulada (USD)", "target": "10000 o más" }]
+    },
+    {
+      "id": "g10y",
+      "horizon": "10y",
+      "deadline": "2036-12-31",
+      "title": "Dueño de una empresa de software que funciona sin depender de mí"
+    }
+  ],
+  "phases": [
+    {
+      "id": 1, "name": "Fundamentos", "start": "2026-10-19", "end": "2026-11-01",
+      "business": ["Definir servicio, precios y oferta", "Actualizar LinkedIn y GitHub", "Empezar proyecto de muestra 1"],
+      "trading": ["Abrir cuenta demo", "Velas japonesas y temporalidades", "Crear diario de trading"],
+      "reading": "El almanaque de Naval Ravikant"
+    },
+    {
+      "id": 2, "name": "Portafolio", "start": "2026-11-02", "end": "2026-11-15",
+      "business": ["Terminar proyecto 1", "Empezar proyecto 2", "Tramitar RUC", "Lista de 30 negocios objetivo"],
+      "trading": ["Tendencias, soportes y resistencias", "10 operaciones en demo"],
+      "reading": "El almanaque de Naval Ravikant (cierre)"
+    },
+    {
+      "id": 3, "name": "Prospección", "start": "2026-11-16", "end": "2026-11-29",
+      "business": ["Contactar 20 negocios", "Enviar 5 propuestas", "Terminar proyecto 2"],
+      "trading": ["Gestión de riesgo: stop loss, tamaño de posición, regla del 1-2%", "20 operaciones en demo"],
+      "reading": "$100M Offers, Alex Hormozi"
+    },
+    {
+      "id": 4, "name": "Exámenes", "start": "2026-11-30", "end": "2026-12-13",
+      "business": ["Solo seguimiento de propuestas (viernes)"],
+      "trading": ["Solo revisión del diario, sin operar"],
+      "reading": null
+    },
+    {
+      "id": 5, "name": "Primer cliente", "start": "2026-12-14", "end": "2026-12-27",
+      "business": ["Cerrar primer cliente y construir su proyecto"],
+      "trading": ["Medias móviles y RSI", "30 operaciones y revisión de estadísticas"],
+      "reading": "$100M Offers (cierre)"
+    },
+    {
+      "id": 6, "name": "Entrega y revisión", "start": "2026-12-28", "end": "2027-01-10",
+      "business": ["Entregar y cobrar", "Ofrecer mantenimiento mensual", "Pedir referidos", "Avanzar el POS", "Revisión de 90 días"],
+      "trading": ["Decidir con datos: seguir en demo o pasar a real con capital pequeño"],
+      "reading": "El inversor inteligente, Benjamin Graham"
+    }
+  ],
+  "weeklyBlocks": [
+    { "day": "MO", "start": "09:00", "end": "10:40", "category": "negocio", "title": "Contactar clientes y propuestas" },
+    { "day": "MO", "start": "16:00", "end": "17:00", "category": "estudio", "title": "Algoritmos y Estructuras de Datos" },
+    { "day": "TU", "start": "09:00", "end": "11:00", "category": "salud", "title": "Entrenamiento futsal" },
+    { "day": "TU", "start": "14:00", "end": "15:00", "category": "estudio", "title": "Cloud y tareas" },
+    { "day": "TU", "start": "17:00", "end": "18:30", "category": "estudio", "title": "Cloud y tareas" },
+    { "day": "WE", "start": "08:30", "end": "10:00", "category": "trading", "title": "Práctica en demo + diario" },
+    { "day": "WE", "start": "21:00", "end": "22:00", "category": "lectura", "title": "Libro del mes" },
+    { "day": "TH", "start": "12:30", "end": "14:30", "category": "estudio", "title": "Machine Learning" },
+    { "day": "TH", "start": "14:30", "end": "16:00", "category": "negocio", "title": "Portafolio y proyectos (POS)" },
+    { "day": "FR", "start": "13:00", "end": "14:00", "category": "trading", "title": "Estudio de gráficos y backtesting" },
+    { "day": "FR", "start": "14:00", "end": "15:30", "category": "negocio", "title": "Seguimiento de clientes" },
+    { "day": "SA", "start": "09:00", "end": "11:00", "category": "salud", "title": "Entrenamiento futsal" },
+    { "day": "SA", "start": "13:00", "end": "16:00", "category": "negocio", "title": "Trabajo profundo" },
+    { "day": "SU", "start": "09:00", "end": "12:00", "category": "negocio", "title": "Trabajo profundo" },
+    { "day": "SU", "start": "18:00", "end": "19:00", "category": "revision", "title": "Revisión semanal completa" }
+  ],
+  "weeklyKpis": [
+    { "id": "horas_negocio", "label": "Horas de negocio", "target": 11, "unit": "h" },
+    { "id": "negocios_contactados", "label": "Negocios contactados", "target": 5, "unit": "", "fromPhase": 3 },
+    { "id": "propuestas", "label": "Propuestas enviadas", "target": 2, "unit": "", "fromPhase": 3 },
+    { "id": "ingresos", "label": "Ingresos de la semana", "target": null, "unit": "PEN", "fromPhase": 5 },
+    { "id": "aporte_sp500", "label": "Aporte al S&P 500", "target": "20-30% de lo ganado", "unit": "USD" },
+    { "id": "ops_demo", "label": "Operaciones en demo", "target": 5, "unit": "" },
+    { "id": "paginas", "label": "Páginas leídas", "target": 50, "unit": "" },
+    { "id": "entrenamientos", "label": "Entrenamientos", "target": 2, "unit": "" }
+  ]
+}

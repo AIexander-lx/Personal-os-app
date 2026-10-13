@@ -3,7 +3,7 @@ import { Outlet, NavLink } from 'react-router-dom'
 import { clsx } from 'clsx'
 import { NavBar } from '@/components/common'
 import ToastHost from '@/components/ToastHost'
-import { useUserStore, useCourseStore, useGamificationStore } from '@/store'
+import { useUserStore, useCourseStore, useGamificationStore, usePlanStore } from '@/store'
 
 /** Reevalúa los logros ante cualquier cambio relevante de datos. */
 function useAchievementWatcher() {
@@ -17,9 +17,12 @@ function useAchievementWatcher() {
       .map((c) => c.topics.reduce((a, t) => a + (t.completedExercises ?? 0), 0))
       .join(','),
   )
+  const planSig = usePlanStore(
+    (s) => `${Object.values(s.checklist).filter(Boolean).length}|${s.checklist['g90-5'] ? 1 : 0}|${s.reviews.length}`,
+  )
   useEffect(() => {
     evaluate()
-  }, [evaluate, userSig, courseSig])
+  }, [evaluate, userSig, courseSig, planSig])
 }
 
 const mobileLinks = [
@@ -28,7 +31,8 @@ const mobileLinks = [
   { to: '/study', label: 'Study', icon: '⏱️' },
   { to: '/streakstudy', label: 'Streak', icon: '🚀' },
   { to: '/health', label: 'Salud', icon: '💪' },
-  { to: '/career', label: 'Carrera', icon: '🧭' },
+  { to: '/plan', label: 'Plan', icon: '🎯' },
+  { to: '/review', label: 'Revisión', icon: '🧭' },
 ]
 
 export function MainLayout() {
@@ -74,7 +78,7 @@ export function MainLayout() {
         </main>
 
         {/* Bottom nav mobile */}
-        <nav className="sticky bottom-0 z-30 grid grid-cols-6 border-t border-surface-border/50 bg-surface/90 backdrop-blur lg:hidden">
+        <nav className="sticky bottom-0 z-30 grid grid-cols-7 border-t border-surface-border/50 bg-surface/90 backdrop-blur lg:hidden">
           {mobileLinks.map((l) => (
             <NavLink
               key={l.to}
