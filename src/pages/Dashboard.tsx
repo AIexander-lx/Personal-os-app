@@ -2,7 +2,8 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, StatBox, ProgressBar } from '@/components/common'
 import DaySchedule from '@/components/DaySchedule'
-import { useUserStore, useCourseStore, useGamificationStore } from '@/store'
+import CurrentPhaseCard from '@/components/CurrentPhaseCard'
+import { useUserStore, useCourseStore, useGamificationStore, usePlanStore } from '@/store'
 import {
   getLevelInfo,
   levelProgress,
@@ -10,6 +11,8 @@ import {
   formatXP,
   courseProgress,
   localDayKey,
+  dayCodeOf,
+  weekStartKey,
 } from '@/utils'
 import { subDays, format, parseISO, isAfter } from 'date-fns'
 
@@ -51,7 +54,14 @@ export default function Dashboard() {
   const courses = useCourseStore((s) => s.courses)
   const achievements = useGamificationStore((s) => s.achievements)
 
+  const reviews = usePlanStore((s) => s.reviews)
+
   const level = getLevelInfo(user.totalXP)
+
+  // Domingo sin revisión registrada → recordatorio.
+  const now = new Date()
+  const reviewPending =
+    dayCodeOf(now) === 'SU' && !reviews.some((r) => r.weekStart === weekStartKey(now))
 
   // Serie XP acumulada de los últimos 30 días.
   const chart = useMemo(() => {
@@ -91,6 +101,23 @@ export default function Dashboard() {
         <StatBox label="Racha" value={`${user.streak} 🔥`} icon="📅" accent="amber" hint="días consecutivos" />
         <StatBox label="Sesiones" value={user.sessions} icon="✅" accent="emerald" hint={`${sessions.length} registradas aquí`} />
       </section>
+
+      {reviewPending && (
+        <Link
+          to="/review"
+          className="flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 transition-colors hover:bg-amber-500/15 animate-fade-in"
+        >
+          <span className="text-2xl">🧭</span>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-fg">Hoy toca la revisión semanal</p>
+            <p className="text-xs text-muted">18:00–19:00 · registra tus indicadores de la semana (+50 XP)</p>
+          </div>
+          <span className="text-sm text-amber-700 dark:text-amber-300">Ir →</span>
+        </Link>
+      )}
+
+      {/* Fase actual del Plan Millonario */}
+      <CurrentPhaseCard compact />
 
       {/* Bloque de día */}
       <DaySchedule />
@@ -186,10 +213,20 @@ export default function Dashboard() {
               to="/health"
               className="flex items-center gap-3 rounded-lg bg-elevated/60 p-3 text-fg transition-colors hover:bg-elevated"
             >
-              <span className="text-lg">💪</span>
+              <span className="text-lg">⚽</span>
               <div>
-                <p className="text-sm font-semibold">Registrar gym</p>
-                <p className="text-[11px] text-muted">06:00–08:00 · Lun a Vie</p>
+                <p className="text-sm font-semibold">Registrar entrenamiento</p>
+                <p className="text-[11px] text-muted">Futsal · mar y sáb 09:00–11:00</p>
+              </div>
+            </Link>
+            <Link
+              to="/review"
+              className="flex items-center gap-3 rounded-lg bg-elevated/60 p-3 text-fg transition-colors hover:bg-elevated"
+            >
+              <span className="text-lg">🧭</span>
+              <div>
+                <p className="text-sm font-semibold">Revisión semanal</p>
+                <p className="text-[11px] text-muted">Domingo 18:00–19:00 · indicadores</p>
               </div>
             </Link>
             <Link

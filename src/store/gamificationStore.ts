@@ -5,6 +5,8 @@ import { achievements as seedAchievements } from '@/data/achievements'
 import { useUserStore } from './userStore'
 import { useCourseStore } from './courseStore'
 import { useToastStore } from './toastStore'
+import { usePlanStore } from './planStore'
+import { goal90 } from '@/data/plan'
 import { courseProgress, todayKey, localDayKey } from '@/utils'
 
 interface GamificationState {
@@ -22,6 +24,18 @@ const initial: AchievementState[] = seedAchievements.map((a) => ({
   unlockedAt: undefined,
 }))
 
+/**
+ * Combina los logros guardados con la lista actual: agrega los nuevos
+ * (p. ej. los del Plan Millonario) y conserva lo ya desbloqueado.
+ */
+export function mergeAchievements(saved: AchievementState[] | undefined): AchievementState[] {
+  const byId = new Map((saved ?? []).map((a) => [a.id, a]))
+  return initial.map((seed) => {
+    const prev = byId.get(seed.id)
+    return prev ? { ...seed, unlocked: prev.unlocked, unlockedAt: prev.unlockedAt } : seed
+  })
+}
+
 export const useGamificationStore = create<GamificationState>()(
   persist(
     (set) => ({
@@ -31,6 +45,9 @@ export const useGamificationStore = create<GamificationState>()(
         const { user, sessions, gym, sleep, energy, githubCommits, peersHelped } =
           useUserStore.getState()
         const { courses } = useCourseStore.getState()
+        const { checklist, reviews } = usePlanStore.getState()
+        const checklistIds = (goal90.checklist ?? []).map((c) => c.id)
+        const plan90Done = checklistIds.length > 0 && checklistIds.every((id) => checklist[id])
         const totalHours =
           sessions.reduce((s, x) => s + x.duration, 0) / 60
         const aed = courses.find((c) => c.id === 'course_aed')
@@ -60,6 +77,14 @@ export const useGamificationStore = create<GamificationState>()(
               return user.streak >= 30
             case 'level-10':
               return user.level >= 10
+            case 'plan-first-client':
+              return !!checklist['g90-5']
+            case 'plan-90-complete':
+              return plan90Done
+            case 'review-1':
+              return reviews.length >= 1
+            case 'review-4':
+              return reviews.length >= 4
             default:
               break
           }
@@ -112,6 +137,12 @@ export const useGamificationStore = create<GamificationState>()(
 
       resetAchievements: () => set({ achievements: initial }),
     }),
-    { name: 'gamification-store' },
+    {
+      name: 'gamification-store',
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<GamificationState>
+        return { ...current, ...p, achievements: mergeAchievements(p.achievements) }
+      },
+    },
   ),
 )

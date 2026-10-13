@@ -123,7 +123,7 @@ export default function Health() {
     <div className="space-y-6">
       <header className="animate-fade-in">
         <h1 className="text-2xl font-bold text-fg sm:text-3xl">Salud & energía</h1>
-        <p className="text-sm text-muted">Gym 06:00–08:00 · sueño · energía</p>
+        <p className="text-sm text-muted">Entrenamiento (futsal mar y sáb 09:00–11:00) · sueño · energía</p>
       </header>
 
       <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">

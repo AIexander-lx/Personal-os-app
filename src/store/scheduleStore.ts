@@ -29,6 +29,11 @@ export const useScheduleStore = create<ScheduleState>()(
 
       resetSchedule: () => set({ blocks: seed }),
     }),
-    { name: 'schedule-store' },
+    {
+      name: 'schedule-store',
+      // v1: el horario pasa a ser semanal (bloques por día del Plan Millonario).
+      version: 1,
+      migrate: () => ({ blocks: seed }),
+    },
   ),
 )

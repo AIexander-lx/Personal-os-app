@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { clsx } from 'clsx'
-import { format, isWeekend } from 'date-fns'
+import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Card } from '@/components/common'
-import { toMinutes, type TimeBlock } from '@/data/schedule'
+import { toMinutes, blockDays, WEEK_DAYS, type TimeBlock } from '@/data/schedule'
 import { useScheduleStore } from '@/store'
-import { formatDuration } from '@/utils'
+import { formatDuration, dayCodeOf } from '@/utils'
+import type { DayCode } from '@/types'
 
-type BlockStatus = 'done' | 'current' | 'upcoming' | 'off'
+type BlockStatus = 'done' | 'current' | 'upcoming'
 
 interface EnrichedBlock extends TimeBlock {
   status: BlockStatus
@@ -20,9 +21,38 @@ const ROUTE_OPTIONS = [
   { value: '/study', label: 'Study' },
   { value: '/health', label: 'Salud' },
   { value: '/streakstudy', label: 'StreakStudy' },
-  { value: '/career', label: 'Carrera' },
+  { value: '/plan', label: 'Plan' },
+  { value: '/review', label: 'Revisión' },
   { value: '/roadmap', label: 'Roadmap' },
 ]
+
+function DayToggles({ value, onChange }: { value: DayCode[]; onChange: (days: DayCode[]) => void }) {
+  return (
+    <div className="flex gap-0.5" role="group" aria-label="Días">
+      {WEEK_DAYS.map((d) => {
+        const on = value.includes(d.code)
+        return (
+          <button
+            key={d.code}
+            type="button"
+            onClick={() => {
+              const next = on ? value.filter((c) => c !== d.code) : [...value, d.code]
+              // Al menos un día; mantiene el orden L→D.
+              if (next.length) onChange(WEEK_DAYS.map((w) => w.code).filter((c) => next.includes(c)))
+            }}
+            className={clsx(
+              'h-6 w-6 rounded text-[10px] font-semibold transition-colors',
+              on ? 'bg-accent/20 text-accent' : 'bg-control/50 text-muted-2 hover:text-fg',
+            )}
+            aria-pressed={on}
+          >
+            {d.short}
+          </button>
+        )
+      })}
+    </div>
+  )
+}
 
 function ScheduleEditor() {
   const blocks = useScheduleStore((s) => s.blocks)
@@ -82,15 +112,16 @@ function ScheduleEditor() {
               </option>
             ))}
           </select>
-          <label className="flex items-center gap-1 text-[11px] text-muted">
-            <input
-              type="checkbox"
-              checked={!!b.weekdaysOnly}
-              onChange={(e) => updateBlock(b.id, { weekdaysOnly: e.target.checked })}
-              className="h-3.5 w-3.5 accent-cyan-400"
-            />
-            L-V
-          </label>
+          <DayToggles
+            value={blockDays(b)}
+            onChange={(days) =>
+              updateBlock(b.id, {
+                // Todos los días = sin restricción.
+                days: days.length === WEEK_DAYS.length ? undefined : days,
+                weekdaysOnly: undefined,
+              })
+            }
+          />
           <button
             onClick={() => removeBlock(b.id)}
             className="ml-auto text-muted-2 hover:text-rose-600 dark:hover:text-rose-400"
@@ -132,30 +163,30 @@ export function DaySchedule() {
     return () => window.clearInterval(id)
   }, [])
 
-  const weekend = isWeekend(now)
+  const today = dayCodeOf(now)
   const nowMin = now.getHours() * 60 + now.getMinutes()
 
   const blocks = useMemo<EnrichedBlock[]>(() => {
     return [...scheduleBlocks]
+      // Solo los bloques que tocan hoy.
+      .filter((b) => blockDays(b).includes(today))
       .sort((a, b) => toMinutes(a.start) - toMinutes(b.start))
       .map((b) => {
         const start = toMinutes(b.start)
         const end = toMinutes(b.end)
-        const available = !b.weekdaysOnly || !weekend
         let status: BlockStatus = 'upcoming'
         let progress = 0
-        if (!available) status = 'off'
-        else if (nowMin >= end) status = 'done'
+        if (nowMin >= end) status = 'done'
         else if (nowMin >= start && nowMin < end) {
           status = 'current'
           progress = Math.round(((nowMin - start) / (end - start)) * 100)
         }
         return { ...b, status, progress }
       })
-  }, [scheduleBlocks, weekend, nowMin])
+  }, [scheduleBlocks, today, nowMin])
 
   const current = blocks.find((b) => b.status === 'current')
-  const next = blocks.find((b) => b.status === 'upcoming' && (!b.weekdaysOnly || !weekend))
+  const next = blocks.find((b) => b.status === 'upcoming')
 
   const summary = current
     ? `Ahora: ${current.label} · termina ${current.end}`
@@ -187,7 +218,7 @@ export function DaySchedule() {
           <p className="mb-4 text-sm text-fg-soft">{summary}</p>
           {blocks.length === 0 ? (
             <p className="py-4 text-center text-sm text-muted-2">
-              Sin bloques. Pulsa <span className="text-accent">✏️ Editar</span> para agregar tu horario.
+              Sin bloques para hoy. Pulsa <span className="text-accent">✏️ Editar</span> para ajustar tu horario.
             </p>
           ) : (
             <ol className="space-y-1.5">
@@ -200,7 +231,6 @@ export function DaySchedule() {
                       isCurrent && 'border-accent/50 bg-accent/10 shadow-glow',
                       b.status === 'done' && 'border-transparent bg-elevated/30 opacity-55',
                       b.status === 'upcoming' && 'border-surface-border/40 bg-elevated/40',
-                      b.status === 'off' && 'border-transparent bg-elevated/20 opacity-40',
                     )}
                   >
                     <span className="w-24 shrink-0 font-mono text-xs text-muted">
@@ -216,9 +246,6 @@ export function DaySchedule() {
                         )}
                       >
                         {b.label}
-                        {b.status === 'off' && (
-                          <span className="ml-2 text-[11px] text-muted-2">(fin de semana)</span>
-                        )}
                       </p>
                       {isCurrent && (
                         <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-control">
@@ -238,7 +265,7 @@ export function DaySchedule() {
                 )
                 return (
                   <li key={b.id}>
-                    {b.to && b.status !== 'off' ? (
+                    {b.to ? (
                       <Link to={b.to} className="block transition-transform hover:translate-x-0.5">
                         {row}
                       </Link>
