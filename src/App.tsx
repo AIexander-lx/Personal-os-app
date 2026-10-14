@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import MainLayout from './layouts/MainLayout'
-import { Dashboard, Roadmap, Study, StreakStudy, Health, Plan, Review } from './pages'
+import { Dashboard, Roadmap, Study, StreakStudy, Health, Plan, Review, Journal } from './pages'
 
 export default function App() {
   return (
@@ -12,6 +12,7 @@ export default function App() {
         <Route path="/streakstudy" element={<StreakStudy />} />
         <Route path="/health" element={<Health />} />
         <Route path="/plan" element={<Plan />} />
+        <Route path="/journal" element={<Journal />} />
         <Route path="/review" element={<Review />} />
         {/* Ruta antigua: la ruta profesional ahora es el Plan. */}
         <Route path="/career" element={<Navigate to="/plan" replace />} />

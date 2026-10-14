@@ -22,6 +22,7 @@ const ROUTE_OPTIONS = [
   { value: '/health', label: 'Salud' },
   { value: '/streakstudy', label: 'StreakStudy' },
   { value: '/plan', label: 'Plan' },
+  { value: '/journal', label: 'Diario' },
   { value: '/review', label: 'Revisión' },
   { value: '/roadmap', label: 'Roadmap' },
 ]

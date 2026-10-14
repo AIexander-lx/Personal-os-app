@@ -4,9 +4,10 @@ import { es } from 'date-fns/locale'
 import { Card, ProgressBar } from '@/components/common'
 import CurrentPhaseCard from '@/components/CurrentPhaseCard'
 import { usePhaseTaskCount } from '@/components/PhaseTasks'
-import { usePlanStore, useUserStore } from '@/store'
+import { Link } from 'react-router-dom'
+import { usePlanStore, useUserStore, useJournalStore, JOURNAL_CHECKLIST_ID } from '@/store'
 import { plan, goal90, longTermGoals, PLAN_END } from '@/data/plan'
-import { checklistXP, getPhaseStatus } from '@/utils'
+import { checklistXP, getPhaseStatus, demoClosedCount, JOURNAL_GOAL } from '@/utils'
 import type { Goal, PlanPhase } from '@/types'
 
 const longDate = (d: string) => format(parseISO(d), "d 'de' MMMM yyyy", { locale: es })
@@ -86,6 +87,7 @@ function MetaCounter({
 function Checklist90() {
   const checklist = usePlanStore((s) => s.checklist)
   const toggle = usePlanStore((s) => s.toggleChecklist)
+  const demoDone = useJournalStore((s) => demoClosedCount(s.trades))
   const items = goal90.checklist ?? []
   const done = items.filter((i) => checklist[i.id]).length
   const pct = items.length ? Math.round((done / items.length) * 100) : 0
@@ -111,16 +113,12 @@ function Checklist90() {
         {items.map((item) => {
           const isDone = !!checklist[item.id]
           const key = item.id === 'g90-5'
-          return (
-            <button
-              key={item.id}
-              onClick={() => toggle(item.id)}
-              aria-pressed={isDone}
-              className={clsx(
-                'flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-sm transition-colors hover:bg-elevated/50',
-                key && !isDone && 'bg-amber-500/5 ring-1 ring-amber-500/30',
-              )}
-            >
+          const rowCls = clsx(
+            'flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-sm transition-colors hover:bg-elevated/50',
+            key && !isDone && 'bg-amber-500/5 ring-1 ring-amber-500/30',
+          )
+          const inner = (
+            <>
               <span
                 className={clsx(
                   'grid h-5 w-5 shrink-0 place-items-center rounded-md text-[11px]',
@@ -133,13 +131,28 @@ function Checklist90() {
                 {key && '💰 '}
                 {item.text}
               </span>
+              {item.id === JOURNAL_CHECKLIST_ID && (
+                <span className="badge shrink-0 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">
+                  {Math.min(demoDone, JOURNAL_GOAL)}/{JOURNAL_GOAL}
+                </span>
+              )}
               <span className="badge shrink-0 bg-control/60 text-fg-soft">+{checklistXP(item.id)}</span>
+            </>
+          )
+          // Este ítem se marca solo desde el diario de trading.
+          return item.id === JOURNAL_CHECKLIST_ID ? (
+            <Link key={item.id} to="/journal" className={rowCls} title="Se completa solo al registrar 30 operaciones en el diario">
+              {inner}
+            </Link>
+          ) : (
+            <button key={item.id} onClick={() => toggle(item.id)} aria-pressed={isDone} className={rowCls}>
+              {inner}
             </button>
           )
         })}
       </div>
       <p className="mt-3 text-[11px] text-muted-2">
-        Desmarcar devuelve el XP. El primer cliente desbloquea el logro “Primer Cliente” y completar todo, “Plan 90 Días”; si los desmarcas, esos logros se revierten.
+        Desmarcar devuelve el XP. Las 30 operaciones se marcan solas desde el diario. El primer cliente desbloquea el logro “Primer Cliente” y completar todo, “Plan 90 Días”; si los desmarcas, esos logros se revierten.
       </p>
     </Card>
   )

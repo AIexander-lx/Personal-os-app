@@ -31,7 +31,7 @@ const CATEGORY_META: Record<BlockCategory, { icon: string; to?: string }> = {
   negocio: { icon: '💼', to: '/plan' },
   estudio: { icon: '📚', to: '/study' },
   salud: { icon: '⚽', to: '/health' },
-  trading: { icon: '📈', to: '/plan' },
+  trading: { icon: '📈', to: '/journal' },
   lectura: { icon: '📖', to: '/plan' },
   revision: { icon: '🧭', to: '/review' },
 }

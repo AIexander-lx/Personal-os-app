@@ -20,6 +20,7 @@ const links = [
   { to: '/streakstudy', label: 'StreakStudy', icon: '🚀' },
   { to: '/health', label: 'Salud', icon: '💪' },
   { to: '/plan', label: 'Plan', icon: '🎯' },
+  { to: '/journal', label: 'Diario', icon: '📒' },
   { to: '/review', label: 'Revisión', icon: '🧭' },
 ]
 
