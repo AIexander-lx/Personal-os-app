@@ -38,13 +38,14 @@ export function PhaseTasks({ phase, className }: { phase: PlanPhase; className?:
                   <li key={key}>
                     <button
                       onClick={() => toggle(key)}
+                      aria-pressed={done}
                       className="flex w-full items-start gap-2 rounded-md px-1.5 py-1 text-left text-sm transition-colors hover:bg-elevated/60"
                       title={done ? 'Desmarcar' : `Marcar · +${PHASE_TASK_XP} XP`}
                     >
                       <span
                         className={clsx(
                           'mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded text-[10px]',
-                          done ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' : 'bg-elevated text-muted-2 ring-1 ring-surface-border/60',
+                          done ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' : 'bg-elevated text-muted-2 ring-1 ring-surface-border',
                         )}
                       >
                         {done ? '✓' : ''}

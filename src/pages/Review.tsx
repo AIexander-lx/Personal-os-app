@@ -5,11 +5,19 @@ import { es } from 'date-fns/locale'
 import { Card, Sparkline } from '@/components/common'
 import { usePlanStore } from '@/store'
 import { plan } from '@/data/plan'
-import { effectivePhaseNumber, kpiActive, kpiNumericTarget, phaseForDate, weekStartKey } from '@/utils'
+import {
+  effectivePhaseNumber,
+  kpiActive,
+  kpiNumericTarget,
+  phaseForDate,
+  weekStartKey,
+  reviewEarnsXP,
+  REVIEW_XP,
+} from '@/utils'
 import type { WeeklyKpi } from '@/types'
 
 const inputCls =
-  'w-24 rounded-lg border border-surface-border/60 bg-input/60 px-2 py-1.5 text-right text-sm text-fg focus:border-accent focus:outline-none disabled:opacity-40'
+  'w-24 rounded-lg border border-surface-border/60 bg-input/60 px-2 py-1.5 text-right text-sm text-fg focus:border-accent focus:outline-none disabled:opacity-40 aria-[invalid=true]:border-rose-500'
 
 type FormValues = Record<string, string>
 
@@ -65,7 +73,8 @@ export default function Review() {
     const raw = form[id]?.trim()
     if (!raw) return null
     const n = Number(raw.replace(',', '.'))
-    return Number.isFinite(n) ? n : null
+    // Los indicadores no pueden ser negativos.
+    return Number.isFinite(n) && n >= 0 ? n : null
   }
 
   const activeKpis = plan.weeklyKpis.filter((k) => kpiActive(k, phaseNumber))
@@ -143,7 +152,11 @@ export default function Review() {
                   <p className="text-[11px] text-muted-2">
                     {active ? `Meta: ${targetLabel(k)}` : `Se mide desde la fase ${k.fromPhase}`}
                     {active && k.id === 'aporte_sp500' && ingresos != null && ingresos > 0 && (
-                      <> · 20-30% de S/ {ingresos} = S/ {(ingresos * 0.2).toFixed(0)}–{(ingresos * 0.3).toFixed(0)}</>
+                      <>
+                        {' '}
+                        · 20-30% de S/ {ingresos} = S/ {(ingresos * 0.2).toFixed(0)}–{(ingresos * 0.3).toFixed(0)} (conviértelo a
+                        USD al registrar)
+                      </>
                     )}
                   </p>
                 </div>
@@ -151,6 +164,7 @@ export default function Review() {
                   <input
                     type="text"
                     inputMode="decimal"
+                    aria-invalid={!!form[k.id]?.trim() && value == null}
                     value={form[k.id] ?? ''}
                     disabled={!active}
                     onChange={(e) => setForm((f) => ({ ...f, [k.id]: e.target.value }))}
@@ -181,7 +195,11 @@ export default function Review() {
               {existing && <> · guardada {format(parseISO(existing.savedAt), "d MMM HH:mm", { locale: es })}</>}
             </p>
             <button className="rounded-lg bg-accent/15 px-4 py-2 text-sm font-medium text-accent hover:bg-accent/25">
-              {existing ? '💾 Actualizar revisión' : '💾 Guardar revisión · +50 XP'}
+              {existing
+                ? '💾 Actualizar revisión'
+                : reviewEarnsXP(weekStart)
+                  ? `💾 Guardar revisión · +${REVIEW_XP} XP`
+                  : '💾 Guardar en el historial'}
             </button>
           </div>
         </form>

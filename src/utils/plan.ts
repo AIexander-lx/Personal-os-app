@@ -1,4 +1,4 @@
-import { differenceInCalendarDays, format, parseISO, startOfWeek } from 'date-fns'
+import { addWeeks, differenceInCalendarDays, format, parseISO, startOfWeek } from 'date-fns'
 import type { DayCode, PlanPhase, WeeklyKpi } from '@/types'
 
 const DAY_CODES: DayCode[] = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA']
@@ -95,6 +95,14 @@ export function checklistXP(id: string): number {
 
 export const PHASE_TASK_XP = 25
 export const REVIEW_XP = 50
+
+/**
+ * La revisión da XP solo si es de esta semana o de la anterior (se puede
+ * llenar el lunes). Registrar semanas viejas queda como historial, sin XP.
+ */
+export function reviewEarnsXP(weekStart: string, now: Date = new Date()): boolean {
+  return weekStart >= weekStartKey(addWeeks(now, -1)) && weekStart <= weekStartKey(now)
+}
 
 /** Clave estable de una tarea de fase: `fase:área:índice`. */
 export function phaseTaskKey(phaseId: number, area: 'business' | 'trading' | 'reading', idx: number): string {

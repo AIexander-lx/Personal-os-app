@@ -115,6 +115,7 @@ function Checklist90() {
             <button
               key={item.id}
               onClick={() => toggle(item.id)}
+              aria-pressed={isDone}
               className={clsx(
                 'flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left text-sm transition-colors hover:bg-elevated/50',
                 key && !isDone && 'bg-amber-500/5 ring-1 ring-amber-500/30',
@@ -123,7 +124,7 @@ function Checklist90() {
               <span
                 className={clsx(
                   'grid h-5 w-5 shrink-0 place-items-center rounded-md text-[11px]',
-                  isDone ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' : 'bg-elevated text-muted-2 ring-1 ring-surface-border/60',
+                  isDone ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300' : 'bg-elevated text-muted-2 ring-1 ring-surface-border',
                 )}
               >
                 {isDone ? '✓' : ''}
@@ -138,7 +139,7 @@ function Checklist90() {
         })}
       </div>
       <p className="mt-3 text-[11px] text-muted-2">
-        Desmarcar devuelve el XP. El primer cliente desbloquea el logro “Primer Cliente” y completar todo, “Plan 90 Días”.
+        Desmarcar devuelve el XP. El primer cliente desbloquea el logro “Primer Cliente” y completar todo, “Plan 90 Días”; si los desmarcas, esos logros se revierten.
       </p>
     </Card>
   )

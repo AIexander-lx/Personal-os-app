@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { WeeklyReview } from '@/types'
 import { goal90 } from '@/data/plan'
-import { checklistXP, PHASE_TASK_XP, REVIEW_XP } from '@/utils'
+import { checklistXP, PHASE_TASK_XP, REVIEW_XP, reviewEarnsXP } from '@/utils'
 import { useUserStore } from './userStore'
 import { useToastStore } from './toastStore'
 
@@ -16,7 +16,7 @@ interface PlanState {
 
   toggleChecklist: (id: string) => void
   togglePhaseTask: (key: string) => void
-  /** Crea o actualiza la revisión de la semana. Da XP solo la primera vez. */
+  /** Crea o actualiza la revisión de la semana. Da XP solo la primera vez y solo para la semana actual o la anterior. */
   saveReview: (weekStart: string, values: Record<string, number | null>, note?: string) => void
   resetPlan: () => void
 }
@@ -71,11 +71,12 @@ export const usePlanStore = create<PlanState>()(
           ),
         }))
         if (!exists) {
-          applyXP(REVIEW_XP)
+          const earns = reviewEarnsXP(weekStart)
+          if (earns) applyXP(REVIEW_XP)
           useToastStore.getState().push({
             icon: '🧭',
             title: 'Revisión semanal guardada',
-            description: `+${REVIEW_XP} XP`,
+            description: earns ? `+${REVIEW_XP} XP` : 'Semana pasada: queda en el historial (sin XP)',
           })
         } else {
           useToastStore.getState().push({ icon: '💾', title: 'Revisión actualizada', description: 'Semana del ' + weekStart })
