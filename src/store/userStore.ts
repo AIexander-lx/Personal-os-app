@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { StudySession, GymEntry, SleepEntry, EnergyEntry, User } from '@/types'
-import { sessionXP, getLevelInfo, todayKey, localDayKey } from '@/utils'
+import type { StudySession, GymEntry, SleepEntry, EnergyEntry, User, XPEvent } from '@/types'
+import { sessionXP, getLevelInfo, todayKey, localDayKey, trimXPLog } from '@/utils'
 import { differenceInCalendarDays, parseISO } from 'date-fns'
 
 interface UserState {
@@ -10,6 +10,8 @@ interface UserState {
   gym: GymEntry[]
   sleep: SleepEntry[]
   energy: EnergyEntry[]
+  /** Historial de XP fuera de las sesiones, para el gráfico del Dashboard. */
+  xpLog: XPEvent[]
   /** Contadores manuales para logros sin fuente de datos automática. */
   githubCommits: number
   peersHelped: number
@@ -67,6 +69,7 @@ export const useUserStore = create<UserState>()(
       gym: [],
       sleep: [],
       energy: [],
+      xpLog: [],
       githubCommits: 0,
       peersHelped: 0,
 
@@ -99,8 +102,13 @@ export const useUserStore = create<UserState>()(
         set((state) => {
           // Nunca por debajo de 0 (desmarcar tareas del plan resta XP).
           const totalXP = Math.max(0, state.user.totalXP + xp)
+          // Se registra el cambio real (puede ser menor si se topó en 0).
+          const applied = totalXP - state.user.totalXP
           return {
             user: { ...state.user, totalXP, level: getLevelInfo(totalXP).level },
+            xpLog: applied
+              ? trimXPLog([...state.xpLog, { date: new Date().toISOString(), xp: applied }])
+              : state.xpLog,
           }
         }),
 
@@ -143,6 +151,7 @@ export const useUserStore = create<UserState>()(
           gym: [],
           sleep: [],
           energy: [],
+          xpLog: [],
           githubCommits: 0,
           peersHelped: 0,
         }),

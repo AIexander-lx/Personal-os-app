@@ -32,6 +32,21 @@ describe('userStore.addSession', () => {
   })
 })
 
+describe('userStore.addXP', () => {
+  it('registra el movimiento real de XP en el historial', () => {
+    useUserStore.getState().addXP(40)
+    useUserStore.getState().addXP(-100) // se topa en 0: solo baja 40
+    const { user, xpLog } = useUserStore.getState()
+    expect(user.totalXP).toBe(0)
+    expect(xpLog.map((e) => e.xp)).toEqual([40, -40])
+  })
+
+  it('no registra cambios de 0', () => {
+    useUserStore.getState().addXP(-10)
+    expect(useUserStore.getState().xpLog).toHaveLength(0)
+  })
+})
+
 describe('gamificationStore.evaluate', () => {
   it('desbloquea "First Session" tras la primera sesión y suma su bono', () => {
     useUserStore.getState().addSession({
