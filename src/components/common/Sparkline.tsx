@@ -13,8 +13,10 @@ export function Sparkline({ values, target, className }: SparklineProps) {
   const pad = 4
   const nums = values.filter((v): v is number => v != null)
   const max = Math.max(1, target ?? 0, ...nums)
+  // Admite valores negativos (p. ej. la curva de R del diario).
+  const min = Math.min(0, target ?? 0, ...nums)
   const stepX = (w - pad * 2) / Math.max(1, values.length - 1)
-  const y = (v: number) => h - pad - (v / max) * (h - pad * 2)
+  const y = (v: number) => h - pad - ((v - min) / (max - min)) * (h - pad * 2)
 
   // Segmentos continuos (se corta donde no hay dato).
   const segments: string[] = []

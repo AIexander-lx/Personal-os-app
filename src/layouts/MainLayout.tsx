@@ -27,11 +27,11 @@ function useAchievementWatcher() {
 
 const mobileLinks = [
   { to: '/', label: 'Inicio', icon: '🏠', end: true },
-  { to: '/roadmap', label: 'Roadmap', icon: '🗺️' },
   { to: '/study', label: 'Study', icon: '⏱️' },
   { to: '/streakstudy', label: 'Streak', icon: '🚀' },
   { to: '/health', label: 'Salud', icon: '💪' },
   { to: '/plan', label: 'Plan', icon: '🎯' },
+  { to: '/journal', label: 'Diario', icon: '📒' },
   { to: '/review', label: 'Revisión', icon: '🧭' },
 ]
 

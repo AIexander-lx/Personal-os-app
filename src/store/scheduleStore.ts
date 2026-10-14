@@ -32,8 +32,16 @@ export const useScheduleStore = create<ScheduleState>()(
     {
       name: 'schedule-store',
       // v1: el horario pasa a ser semanal (bloques por día del Plan Millonario).
-      version: 1,
-      migrate: () => ({ blocks: seed }),
+      // v2: los bloques de trading enlazan al diario (sin tocar el resto).
+      version: 2,
+      migrate: (persisted, version) => {
+        if (version < 1) return { blocks: seed }
+        const state = persisted as { blocks: TimeBlock[] }
+        return {
+          ...state,
+          blocks: state.blocks.map((b) => (b.icon === '📈' && b.to === '/plan' ? { ...b, to: '/journal' } : b)),
+        }
+      },
     },
   ),
 )

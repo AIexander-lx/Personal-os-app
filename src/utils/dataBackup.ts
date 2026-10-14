@@ -9,6 +9,7 @@ export const STORE_KEYS = [
   'career-store',
   'schedule-store',
   'plan-store',
+  'journal-store',
 ] as const
 
 const APP_MARKER = 'personal-os'

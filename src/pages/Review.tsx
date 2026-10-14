@@ -3,7 +3,7 @@ import { clsx } from 'clsx'
 import { addDays, addWeeks, format, parseISO } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { Card, Sparkline } from '@/components/common'
-import { usePlanStore } from '@/store'
+import { usePlanStore, useJournalStore } from '@/store'
 import { plan } from '@/data/plan'
 import {
   effectivePhaseNumber,
@@ -13,6 +13,7 @@ import {
   weekStartKey,
   reviewEarnsXP,
   REVIEW_XP,
+  demoTradesInWeek,
 } from '@/utils'
 import type { WeeklyKpi } from '@/types'
 
@@ -82,6 +83,7 @@ export default function Review() {
   const metCount = measurable.filter((k) => metTarget(k, parsed(k.id)) === true).length
 
   const ingresos = parsed('ingresos')
+  const journalOps = useJournalStore((s) => demoTradesInWeek(s.trades, weekStart))
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault()
@@ -156,6 +158,19 @@ export default function Review() {
                         {' '}
                         · 20-30% de S/ {ingresos} = S/ {(ingresos * 0.2).toFixed(0)}–{(ingresos * 0.3).toFixed(0)} (conviértelo a
                         USD al registrar)
+                      </>
+                    )}
+                    {active && k.id === 'ops_demo' && journalOps > 0 && String(journalOps) !== form[k.id]?.trim() && (
+                      <>
+                        {' '}
+                        · Diario: {journalOps} esta semana{' '}
+                        <button
+                          type="button"
+                          onClick={() => setForm((f) => ({ ...f, ops_demo: String(journalOps) }))}
+                          className="font-medium text-accent hover:underline"
+                        >
+                          usar
+                        </button>
                       </>
                     )}
                   </p>
