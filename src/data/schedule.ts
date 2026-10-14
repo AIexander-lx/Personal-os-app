@@ -1,27 +1,77 @@
+import type { BlockCategory, DayCode } from '@/types'
+import { plan } from './plan'
+
 export interface TimeBlock {
   id: string
   label: string
   icon: string
   start: string // "HH:MM"
   end: string // "HH:MM"
-  /** Solo días laborables (Lun–Vie). */
+  /** Días en los que aplica. Sin definir = todos los días. */
+  days?: DayCode[]
+  /** Legado: solo días laborables (Lun–Vie). Se ignora si hay `days`. */
   weekdaysOnly?: boolean
   /** Ruta a la que enlaza el bloque, si aplica. */
   to?: string
 }
 
-/**
- * Estructura de día inamovible del usuario.
- * Los espacios entre bloques se muestran como tiempo libre.
- */
-export const daySchedule: TimeBlock[] = [
-  { id: 'gym', label: 'Gimnasio', icon: '💪', start: '06:00', end: '08:00', weekdaysOnly: true, to: '/health' },
-  { id: 'deep', label: 'Deep Learning · estudio profundo', icon: '🧠', start: '09:00', end: '12:15', to: '/study' },
-  { id: 'practice', label: 'Práctica y ejercicios', icon: '✏️', start: '13:00', end: '16:15', to: '/study' },
-  { id: 'streak', label: 'StreakStudy', icon: '🚀', start: '17:00', end: '18:45', to: '/streakstudy' },
-  { id: 'english', label: 'Inglés técnico', icon: '🌐', start: '19:45', end: '20:15' },
-  { id: 'sleep', label: 'Dormir', icon: '😴', start: '22:30', end: '23:30' },
+export const WEEK_DAYS: { code: DayCode; short: string }[] = [
+  { code: 'MO', short: 'L' },
+  { code: 'TU', short: 'M' },
+  { code: 'WE', short: 'X' },
+  { code: 'TH', short: 'J' },
+  { code: 'FR', short: 'V' },
+  { code: 'SA', short: 'S' },
+  { code: 'SU', short: 'D' },
 ]
+
+const WEEKDAYS: DayCode[] = ['MO', 'TU', 'WE', 'TH', 'FR']
+
+const CATEGORY_META: Record<BlockCategory, { icon: string; to?: string }> = {
+  negocio: { icon: '💼', to: '/plan' },
+  estudio: { icon: '📚', to: '/study' },
+  salud: { icon: '⚽', to: '/health' },
+  trading: { icon: '📈', to: '/plan' },
+  lectura: { icon: '📖', to: '/plan' },
+  revision: { icon: '🧭', to: '/review' },
+}
+
+/** Días efectivos de un bloque (resuelve el legado `weekdaysOnly`). */
+export function blockDays(b: TimeBlock): DayCode[] {
+  if (b.days && b.days.length) return b.days
+  if (b.weekdaysOnly) return WEEKDAYS
+  return WEEK_DAYS.map((d) => d.code)
+}
+
+/**
+ * Bloques semanales del Plan Millonario. Los bloques con el mismo título y
+ * horario se agrupan (p. ej. futsal martes y sábado).
+ */
+function fromPlan(): TimeBlock[] {
+  const byKey = new Map<string, TimeBlock>()
+  for (const wb of plan.weeklyBlocks) {
+    const key = `${wb.title}|${wb.start}|${wb.end}`
+    const existing = byKey.get(key)
+    if (existing) {
+      existing.days = [...(existing.days ?? []), wb.day]
+      continue
+    }
+    const meta = CATEGORY_META[wb.category]
+    byKey.set(key, {
+      id: `wb_${wb.day}_${wb.start.replace(':', '')}`,
+      label: wb.title,
+      icon: meta.icon,
+      start: wb.start,
+      end: wb.end,
+      days: [wb.day],
+      to: meta.to,
+    })
+  }
+  return [...byKey.values()]
+}
+
+/** Horario semanal por defecto (Plan Millonario). Editable desde el Dashboard. */
+export const daySchedule: TimeBlock[] = fromPlan()
 
 /** "HH:MM" → minutos desde medianoche. */
 export function toMinutes(hhmm: string): number {

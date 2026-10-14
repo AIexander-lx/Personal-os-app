@@ -97,7 +97,8 @@ export const useUserStore = create<UserState>()(
 
       addXP: (xp) =>
         set((state) => {
-          const totalXP = state.user.totalXP + xp
+          // Nunca por debajo de 0 (desmarcar tareas del plan resta XP).
+          const totalXP = Math.max(0, state.user.totalXP + xp)
           return {
             user: { ...state.user, totalXP, level: getLevelInfo(totalXP).level },
           }

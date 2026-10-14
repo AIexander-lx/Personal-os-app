@@ -19,7 +19,8 @@ const links = [
   { to: '/study', label: 'Study', icon: '⏱️' },
   { to: '/streakstudy', label: 'StreakStudy', icon: '🚀' },
   { to: '/health', label: 'Salud', icon: '💪' },
-  { to: '/career', label: 'Carrera', icon: '🧭' },
+  { to: '/plan', label: 'Plan', icon: '🎯' },
+  { to: '/review', label: 'Revisión', icon: '🧭' },
 ]
 
 export function NavBar() {
