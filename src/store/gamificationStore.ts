@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { AchievementState } from '@/types'
+import type { Achievement, AchievementState } from '@/types'
 import { achievements as seedAchievements } from '@/data/achievements'
 import { useUserStore } from './userStore'
 import { useCourseStore } from './courseStore'
@@ -23,6 +23,9 @@ const initial: AchievementState[] = seedAchievements.map((a) => ({
   unlocked: false,
   unlockedAt: undefined,
 }))
+
+/** Logros que dependen de casillas del plan: se revierten si se desmarcan. */
+const REVOCABLE = new Set<Achievement['condition']>(['plan-first-client', 'plan-90-complete'])
 
 /**
  * Combina los logros guardados con la lista actual: agrega los nuevos
@@ -99,8 +102,15 @@ export const useGamificationStore = create<GamificationState>()(
         }
 
         const newlyUnlocked: AchievementState[] = []
+        const revoked: AchievementState[] = []
         set((state) => ({
           achievements: state.achievements.map((a) => {
+            // Logros del checklist: si se desmarca la condición, se pierden (y su XP).
+            if (a.unlocked && a.condition && REVOCABLE.has(a.condition) && !isMet(a)) {
+              const updated = { ...a, unlocked: false, unlockedAt: undefined }
+              revoked.push(updated)
+              return updated
+            }
             if (a.unlocked) return a
             if (isMet(a)) {
               const updated = { ...a, unlocked: true, unlockedAt: new Date().toISOString() }
@@ -110,6 +120,17 @@ export const useGamificationStore = create<GamificationState>()(
             return a
           }),
         }))
+
+        if (revoked.length) {
+          useUserStore.getState().addXP(-revoked.reduce((s, a) => s + a.xp, 0))
+          revoked.forEach((a) =>
+            useToastStore.getState().push({
+              icon: '↩️',
+              title: 'Logro revertido',
+              description: `${a.name} · −${a.xp} XP`,
+            }),
+          )
+        }
 
         if (newlyUnlocked.length) {
           const bonus = newlyUnlocked.reduce((s, a) => s + a.xp, 0)

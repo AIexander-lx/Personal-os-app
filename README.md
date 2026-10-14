@@ -17,17 +17,20 @@ Aplicación **100% frontend** (sin backend) que centraliza el seguimiento de est
 
 | Sección | Qué hace |
 | --- | --- |
-| 🏠 **Dashboard** | Stats (XP, nivel, racha, sesiones), gráfico de XP de 30 días, **bloque de día en vivo** que resalta la actividad actual según la hora, progreso por curso y grid de logros. |
+| 🏠 **Dashboard** | Stats (XP, nivel, racha, sesiones), gráfico de XP de 30 días, **fase actual del plan**, **bloque de día en vivo** con el horario semanal (bloques por día) que resalta la actividad actual, progreso por curso y grid de logros. |
 | 🗺️ **Roadmap** | 6 cursos · 38 temas · 163 ejercicios. Tarjetas expandibles con dificultad y XP por tema, filtros por estado/dificultad y búsqueda. |
 | ⏱️ **Study** | Timer Pomodoro (25/45/90 min o personalizado) con anillo de progreso, cálculo de XP en vivo, historial y estadísticas. El reloj se deriva de un *timestamp*, así que no se desfasa aunque la pestaña quede en segundo plano, y avisa con una **notificación del navegador** al terminar. |
 | 🚀 **StreakStudy** | Tracker del proyecto principal: features y bugs con **drag & drop**, fases, barra de completitud y timeline de avances. |
 | 💪 **Health** | Registro de gimnasio semanal (Lun–Vie), racha, y seguimiento de sueño y energía con gráficos de 7 días. |
-| 🧭 **Career** | Roadmap profesional a 2 años (4 fases) con hitos, skills, certificaciones y contadores de portfolio/comunidad. |
+| 🎯 **Plan** | Plan Millonario: reglas de oro, checklist de 90 días con XP, temario de 6 fases (la fase actual se calcula con la fecha), metas a 1, 3 y 10 años y contadores de portfolio/comunidad. Los datos están en `src/data/plan-millonario.json`. |
+| 🧭 **Revisión** | Revisión semanal de domingo: 8 indicadores que se activan según la fase, metas cumplidas, historial y evolución de las últimas 12 semanas. |
 
 ### 🎮 Gamificación
 - **10 niveles profesionales** — de *Beginner* a *Master Architect*.
 - **XP por sesión** = `50 base + 0.5 × minutos` (más bonos por logros).
-- **12 logros desbloqueables** con lógica real (primera sesión, rachas, cursos al 100%, *Perfect Day*, etc.) y **notificaciones (toast)** al desbloquear.
+- **16 logros desbloqueables** con lógica real (primera sesión, rachas, cursos al 100%, *Perfect Day*, primer cliente, revisiones semanales, etc.) y **notificaciones (toast)** al desbloquear.
+- **Plan:** cada ítem del checklist de 90 días da XP (el primer cliente, más) y cada tarea de fase +25 XP. Desmarcar resta el XP, y los logros del checklist se revierten.
+- **Revisión semanal:** +50 XP la primera vez que se guarda la semana actual o la anterior.
 
 ### 🎨 Temas
 - **Claro y oscuro** con toggle en la barra lateral; respeta la preferencia del sistema en el primer arranque y recuerda tu elección.
@@ -86,13 +89,13 @@ La app corre en `http://localhost:5173` (o el puerto que asigne Vite).
 ```
 personal-os/
 ├── src/
-│   ├── pages/          # Dashboard, Roadmap, Study, StreakStudy, Health, Career
+│   ├── pages/          # Dashboard, Roadmap, Study, StreakStudy, Health, Plan, Review
 │   ├── components/     # DaySchedule, ToastHost y comunes (Card, ProgressBar, StatBox, NavBar)
-│   ├── store/          # userStore, courseStore, gamificationStore, toastStore
-│   ├── data/           # courses, achievements, schedule
-│   ├── utils/          # gamification, formatters, dataBackup
+│   ├── store/          # userStore, courseStore, gamificationStore, scheduleStore, planStore, toastStore, themeStore
+│   ├── data/           # courses, achievements, schedule, plan (+ plan-millonario.json)
+│   ├── utils/          # gamification, formatters, dataBackup, plan
 │   ├── layouts/        # MainLayout
-│   ├── types/          # course, user, achievement
+│   ├── types/          # course, user, achievement, plan
 │   └── styles/         # globals.css
 ├── index.html
 └── vite.config.ts
@@ -112,6 +115,8 @@ Los temas de **AED** y **Sistemas Computacionales** están alineados con el síl
 - [x] Tests con Vitest
 - [x] PWA instalable + notificaciones del timer
 - [x] Tema claro/oscuro con contraste AA
+- [x] Plan Millonario: metas, fases, revisión semanal
+- [ ] Diario de trading
 - [ ] Backend (Spring Boot + PostgreSQL)
 - [ ] Sincronización multi-dispositivo (AWS)
 - [ ] Autenticación

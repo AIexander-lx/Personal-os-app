@@ -13,6 +13,7 @@ import {
   localDayKey,
   dayCodeOf,
   weekStartKey,
+  REVIEW_XP,
 } from '@/utils'
 import { subDays, format, parseISO, isAfter } from 'date-fns'
 
@@ -110,7 +111,7 @@ export default function Dashboard() {
           <span className="text-2xl">🧭</span>
           <div className="flex-1">
             <p className="text-sm font-semibold text-fg">Hoy toca la revisión semanal</p>
-            <p className="text-xs text-muted">18:00–19:00 · registra tus indicadores de la semana (+50 XP)</p>
+            <p className="text-xs text-muted">18:00–19:00 · registra tus indicadores de la semana (+{REVIEW_XP} XP)</p>
           </div>
           <span className="text-sm text-amber-700 dark:text-amber-300">Ir →</span>
         </Link>

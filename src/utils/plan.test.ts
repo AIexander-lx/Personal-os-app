@@ -9,6 +9,7 @@ import {
   phaseForDate,
   weekStartKey,
   checklistXP,
+  reviewEarnsXP,
 } from './plan'
 
 // Fechas locales (sin 'Z') para no depender de la zona horaria.
@@ -89,6 +90,14 @@ describe('semanas e indicadores', () => {
     expect(kpiNumericTarget(weeklyKpis.find((k) => k.id === 'paginas')!)).toBe(50)
     expect(kpiNumericTarget(weeklyKpis.find((k) => k.id === 'aporte_sp500')!)).toBeNull()
     expect(kpiNumericTarget(weeklyKpis.find((k) => k.id === 'ingresos')!)).toBeNull()
+  })
+
+  it('reviewEarnsXP: semana actual y anterior sí, otras no', () => {
+    const now = d('2026-11-22') // domingo, semana del 16 nov
+    expect(reviewEarnsXP('2026-11-16', now)).toBe(true)
+    expect(reviewEarnsXP('2026-11-09', now)).toBe(true)
+    expect(reviewEarnsXP('2026-11-02', now)).toBe(false)
+    expect(reviewEarnsXP('2026-11-23', now)).toBe(false)
   })
 
   it('el primer cliente vale más XP', () => {
