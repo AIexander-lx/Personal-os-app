@@ -27,6 +27,12 @@ export interface EnergyEntry {
   level: number // 1-10
 }
 
+/** Movimiento de XP que no viene de una sesión de estudio (plan, diario, logros). */
+export interface XPEvent {
+  date: string // ISO
+  xp: number
+}
+
 export interface User {
   id: string
   name: string

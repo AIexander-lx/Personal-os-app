@@ -10,12 +10,11 @@ import {
   xpToNextLevel,
   formatXP,
   courseProgress,
-  localDayKey,
+  xpSeries,
   dayCodeOf,
   weekStartKey,
   REVIEW_XP,
 } from '@/utils'
-import { subDays, format, parseISO, isAfter } from 'date-fns'
 
 /** Área/sparkline simple en SVG a partir de una serie de valores. */
 function XPChart({ points }: { points: { label: string; value: number }[] }) {
@@ -52,6 +51,7 @@ function XPChart({ points }: { points: { label: string; value: number }[] }) {
 export default function Dashboard() {
   const user = useUserStore((s) => s.user)
   const sessions = useUserStore((s) => s.sessions)
+  const xpLog = useUserStore((s) => s.xpLog)
   const courses = useCourseStore((s) => s.courses)
   const achievements = useGamificationStore((s) => s.achievements)
 
@@ -64,24 +64,11 @@ export default function Dashboard() {
   const reviewPending =
     dayCodeOf(now) === 'SU' && !reviews.some((r) => r.weekStart === weekStartKey(now))
 
-  // Serie XP acumulada de los últimos 30 días.
-  const chart = useMemo(() => {
-    const today = new Date()
-    const days = Array.from({ length: 30 }, (_, i) => subDays(today, 29 - i))
-    // XP base antes de la ventana: total actual menos lo ganado en la ventana.
-    const windowStart = subDays(today, 30)
-    const inWindow = sessions.filter((s) => isAfter(parseISO(s.date), windowStart))
-    const windowXP = inWindow.reduce((s, x) => s + x.xp, 0)
-    let cumulative = user.totalXP - windowXP
-    return days.map((d) => {
-      const key = format(d, 'yyyy-MM-dd')
-      const dayXP = inWindow
-        .filter((s) => localDayKey(s.date) === key)
-        .reduce((s, x) => s + x.xp, 0)
-      cumulative += dayXP
-      return { label: format(d, 'd/M'), value: cumulative }
-    })
-  }, [sessions, user.totalXP])
+  // Serie XP acumulada de los últimos 30 días: sesiones + plan, diario y logros.
+  const chart = useMemo(
+    () => xpSeries([...sessions.map((s) => ({ date: s.date, xp: s.xp })), ...xpLog], user.totalXP),
+    [sessions, xpLog, user.totalXP],
+  )
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length
   const nearAchievements = achievements.filter((a) => !a.unlocked).slice(0, 3)
@@ -128,7 +115,7 @@ export default function Dashboard() {
         <Card
           className="lg:col-span-2"
           title="Progreso de XP"
-          subtitle="Últimos 30 días (acumulado)"
+          subtitle="Últimos 30 días · estudio, plan, diario y logros"
           icon="📈"
           action={<span className="badge bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">{formatXP(user.totalXP)}</span>}
         >
