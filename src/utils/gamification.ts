@@ -21,14 +21,6 @@ export const LEVELS: LevelInfo[] = [
   { level: 10, title: 'Master Architect', min: 4500, max: Infinity },
 ]
 
-export const BASE_XP_PER_SESSION = 50
-export const XP_PER_MINUTE = 0.5
-
-/** XP de una sesión: base + bonus por duración. */
-export function sessionXP(durationMinutes: number): number {
-  return Math.round(BASE_XP_PER_SESSION + durationMinutes * XP_PER_MINUTE)
-}
-
 export function getLevelInfo(totalXP: number): LevelInfo {
   return (
     LEVELS.find((l) => totalXP >= l.min && totalXP < l.max) ??

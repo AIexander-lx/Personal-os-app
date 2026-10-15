@@ -36,3 +36,41 @@ export function xpSeries(
     return { label: format(d, 'd/M'), value: Math.max(0, cumulative) }
   })
 }
+
+/** XP ganado cada día (no acumulado) en los últimos `days` días, terminando hoy. */
+export function xpDaily(
+  events: XPEvent[],
+  today: Date = new Date(),
+  days = 30,
+): { key: string; label: string; value: number }[] {
+  const byDay = new Map<string, number>()
+  for (const e of events) {
+    const k = localDayKey(e.date)
+    byDay.set(k, (byDay.get(k) ?? 0) + e.xp)
+  }
+  return Array.from({ length: days }, (_, i) => subDays(today, days - 1 - i)).map((d) => {
+    const key = format(d, 'yyyy-MM-dd')
+    return { key, label: format(d, 'd/M'), value: Math.max(0, byDay.get(key) ?? 0) }
+  })
+}
+
+/**
+ * Días seguidos ganando XP, hasta hoy. Si hoy todavía no ganaste, la racha
+ * sigue viva desde ayer (no se corta hasta que termine el día).
+ */
+export function xpStreak(events: XPEvent[], today: Date = new Date()): number {
+  const days = new Set<string>()
+  const byDay = new Map<string, number>()
+  for (const e of events) {
+    const k = localDayKey(e.date)
+    byDay.set(k, (byDay.get(k) ?? 0) + e.xp)
+  }
+  for (const [k, xp] of byDay) if (xp > 0) days.add(k)
+  let cursor = days.has(format(today, 'yyyy-MM-dd')) ? today : subDays(today, 1)
+  let streak = 0
+  while (days.has(format(cursor, 'yyyy-MM-dd'))) {
+    streak++
+    cursor = subDays(cursor, 1)
+  }
+  return streak
+}

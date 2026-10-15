@@ -49,10 +49,10 @@ export function Sparkline({ values, target, className }: SparklineProps) {
         />
       )}
       {segments.map((d, i) => (
-        <path key={i} d={d} fill="none" stroke="#22d3ee" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+        <path key={i} d={d} fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
       ))}
       {lastIdx != null && (
-        <circle cx={pad + lastIdx * stepX} cy={y(values[lastIdx] as number)} r="2.5" fill="#22d3ee" />
+        <circle cx={pad + lastIdx * stepX} cy={y(values[lastIdx] as number)} r="2.5" fill="currentColor" />
       )}
     </svg>
   )

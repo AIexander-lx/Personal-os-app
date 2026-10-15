@@ -8,9 +8,11 @@ export default {
       // y cambian según el tema claro/oscuro.
       colors: {
         accent: {
+          // soft/dim quedan fijos en el tono "Fintech Dark Pro" (menta eléctrico)
+          // para usos puntuales que no deben invertirse con el tema.
           DEFAULT: 'rgb(var(--accent) / <alpha-value>)',
-          soft: '#22d3ee',
-          dim: '#0891b2',
+          soft: '#10e5a8',
+          dim: '#0a8f68',
         },
         surface: {
           DEFAULT: 'rgb(var(--bg) / <alpha-value>)',
@@ -31,12 +33,15 @@ export default {
       },
       fontFamily: {
         sans: ['Roboto', 'system-ui', 'Segoe UI', 'sans-serif'],
+        // Mono para cifras (XP, %, montos, timers): look "data/fintech".
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       borderRadius: {
-        card: '12px',
+        card: '10px',
       },
       boxShadow: {
-        glow: '0 0 24px -6px rgba(0, 212, 255, 0.35)',
+        // Ring fino + sombra corta en vez de blur difuso: resalta sin "neón".
+        glow: '0 0 0 1px rgb(var(--accent) / 0.45), 0 6px 16px -6px rgb(var(--accent) / 0.35)',
       },
       keyframes: {
         'fade-in': {
@@ -44,8 +49,8 @@ export default {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         'pulse-ring': {
-          '0%': { boxShadow: '0 0 0 0 rgba(0,212,255,0.35)' },
-          '100%': { boxShadow: '0 0 0 12px rgba(0,212,255,0)' },
+          '0%': { boxShadow: '0 0 0 0 rgb(var(--accent) / 0.35)' },
+          '100%': { boxShadow: '0 0 0 12px rgb(var(--accent) / 0)' },
         },
       },
       animation: {

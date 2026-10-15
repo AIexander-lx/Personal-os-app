@@ -1,98 +1,266 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, StatBox, ProgressBar } from '@/components/common'
-import DaySchedule from '@/components/DaySchedule'
-import CurrentPhaseCard from '@/components/CurrentPhaseCard'
-import { useUserStore, useCourseStore, useGamificationStore, usePlanStore } from '@/store'
+import { clsx } from 'clsx'
+import { format } from 'date-fns'
+import { es } from 'date-fns/locale'
+import { Card, ProgressBar } from '@/components/common'
+import DailyGoals from '@/components/DailyGoals'
+import MonthlyGoals from '@/components/MonthlyGoals'
+import { useTodayBlocks } from '@/components/DaySchedule'
+import AreaProgress from '@/components/AreaProgress'
+import { useUserStore, useGamificationStore, usePlanStore } from '@/store'
+import { toMinutes } from '@/data/schedule'
 import {
   getLevelInfo,
   levelProgress,
   xpToNextLevel,
-  formatXP,
-  courseProgress,
-  xpSeries,
+  xpDaily,
+  xpStreak,
   dayCodeOf,
   weekStartKey,
+  formatDuration,
+  timeAgo,
   REVIEW_XP,
+  LEVELS,
 } from '@/utils'
 
-/** Área/sparkline simple en SVG a partir de una serie de valores. */
-function XPChart({ points }: { points: { label: string; value: number }[] }) {
-  const w = 640
-  const h = 180
-  const pad = 8
-  const max = Math.max(1, ...points.map((p) => p.value))
-  const stepX = (w - pad * 2) / Math.max(1, points.length - 1)
-  const coords = points.map((p, i) => {
-    const x = pad + i * stepX
-    const y = h - pad - (p.value / max) * (h - pad * 2)
-    return [x, y] as const
-  })
-  const line = coords.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ')
-  const area = `${line} L${coords[coords.length - 1][0].toFixed(1)},${h - pad} L${pad},${h - pad} Z`
+function greeting(hour: number) {
+  if (hour < 12) return 'Buen día'
+  if (hour < 19) return 'Buenas tardes'
+  return 'Buenas noches'
+}
+
+/** Nivel, XP hacia el siguiente, XP de hoy y racha. */
+function LevelCard() {
+  const user = useUserStore((s) => s.user)
+  const xpLog = useUserStore((s) => s.xpLog)
+  const level = getLevelInfo(user.totalXP)
+  const next = LEVELS.find((l) => l.level === level.level + 1)
+  const todayXP = useMemo(() => xpDaily(xpLog, new Date(), 1)[0].value, [xpLog])
+  const streak = useMemo(() => xpStreak(xpLog), [xpLog])
 
   return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="h-44 w-full" preserveAspectRatio="none">
-      <defs>
-        <linearGradient id="xpFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#00d4ff" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#00d4ff" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path d={area} fill="url(#xpFill)" />
-      <path d={line} fill="none" stroke="#22d3ee" strokeWidth="2.5" strokeLinejoin="round" />
-      {coords.map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r={i === coords.length - 1 ? 4 : 0} fill="#22d3ee" />
-      ))}
-    </svg>
+    <Card className="lg:col-span-2">
+      <div className="flex flex-wrap items-center gap-5">
+        <div className="relative grid h-20 w-20 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-amber-300 to-orange-500 shadow-lg shadow-orange-500/20">
+          <span className="font-mono text-3xl font-black text-white drop-shadow">{level.level}</span>
+          <span className="absolute -bottom-2 rounded-full bg-surface-raised px-2 py-0.5 text-[10px] font-semibold text-fg-soft ring-1 ring-surface-border">
+            NIVEL
+          </span>
+        </div>
+
+        <div className="min-w-[12rem] flex-1">
+          <p className="text-xs uppercase tracking-wider text-muted">Nivel {level.level} de 10</p>
+          <p className="text-xl font-bold text-fg">{level.title}</p>
+          <ProgressBar className="mt-2" value={levelProgress(user.totalXP)} gradient="accent" />
+          <p className="mt-1 font-mono text-xs text-muted">
+            {user.totalXP.toLocaleString('es-PE')} XP
+            {next ? ` · faltan ${xpToNextLevel(user.totalXP)} para ${next.title}` : ' · nivel máximo'}
+          </p>
+        </div>
+
+        <div className="flex gap-3 sm:flex-col">
+          <div className="rounded-lg bg-accent/10 px-3 py-2 text-center">
+            <p className="font-mono text-lg font-bold text-accent">⚡ +{todayXP}</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted">XP hoy</p>
+          </div>
+          <div className="rounded-lg bg-amber-500/10 px-3 py-2 text-center">
+            <p className="font-mono text-lg font-bold text-amber-700 dark:text-amber-300">🔥 {streak}</p>
+            <p className="text-[10px] uppercase tracking-wider text-muted">{streak === 1 ? 'día de racha' : 'días de racha'}</p>
+          </div>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+/** Bloque del horario en el que estás ahora (o el siguiente). */
+function NowCard() {
+  const { nowMin, current, next } = useTodayBlocks()
+  const block = current ?? next
+
+  return (
+    <Card
+      title={current ? 'Ahora' : 'Siguiente'}
+      icon="⏱️"
+      action={
+        <Link to="/agenda" className="text-xs text-accent hover:underline">
+          Ver agenda →
+        </Link>
+      }
+    >
+      {block ? (
+        <div className="flex items-center gap-3">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-accent/10 text-2xl">{block.icon}</span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-semibold text-fg">{block.label}</p>
+            <p className="font-mono text-xs text-muted">
+              {block.start}–{block.end}
+              {current
+                ? ` · termina en ${formatDuration(toMinutes(current.end) - nowMin)}`
+                : ` · empieza en ${formatDuration(Math.max(0, toMinutes(block.start) - nowMin))}`}
+            </p>
+            {current && <ProgressBar className="mt-2" value={current.progress} size="sm" gradient="accent" />}
+          </div>
+        </div>
+      ) : (
+        <p className="py-2 text-sm text-muted">Día completado · a descansar 😴</p>
+      )}
+      {current && next && (
+        <p className="mt-3 truncate text-xs text-muted-2">
+          Después: {next.icon} {next.label} · {next.start}
+        </p>
+      )}
+    </Card>
+  )
+}
+
+/** Barras con el XP ganado cada día de los últimos 30. */
+function XPBars() {
+  const xpLog = useUserStore((s) => s.xpLog)
+  const days = useMemo(() => xpDaily(xpLog), [xpLog])
+  const max = Math.max(1, ...days.map((d) => d.value))
+  const total = days.reduce((s, d) => s + d.value, 0)
+
+  return (
+    <Card
+      title="XP · últimos 30 días"
+      subtitle="Plan, diario, checklist y logros"
+      icon="📈"
+      action={<span className="badge bg-accent/10 font-mono text-accent">+{total.toLocaleString('es-PE')}</span>}
+    >
+      <div className="flex h-36 items-end gap-[3px]">
+        {days.map((d, i) => (
+          <div
+            key={d.key}
+            title={`${d.label}: +${d.value} XP`}
+            className={clsx(
+              'flex-1 rounded-t-sm transition-all duration-500',
+              i === days.length - 1 ? 'bg-accent' : 'bg-accent/45 hover:bg-accent/70',
+            )}
+            style={{ height: `${(d.value / max) * 100}%`, minHeight: d.value ? 4 : 2, opacity: d.value ? 1 : 0.25 }}
+          />
+        ))}
+      </div>
+      <div className="mt-1 flex justify-between text-[10px] text-muted-2">
+        <span>{days[0].label}</span>
+        <span>{days[15].label}</span>
+        <span>hoy</span>
+      </div>
+    </Card>
+  )
+}
+
+const QUICK_LINKS = [
+  { to: '/plan', label: 'Plan', hint: 'Fase y metas', icon: '🎯', tile: 'bg-violet-500/15' },
+  { to: '/estudios', label: 'Estudios', hint: 'Cursos y temas', icon: '🎓', tile: 'bg-cyan-500/15' },
+  { to: '/finanzas?tab=trading', label: 'Diario', hint: 'Trading', icon: '📒', tile: 'bg-amber-500/15' },
+  { to: '/agenda', label: 'Agenda', hint: 'Clases y evaluaciones', icon: '📅', tile: 'bg-emerald-500/15' },
+]
+
+function QuickLinks() {
+  return (
+    <Card title="Accesos rápidos" icon="⚡">
+      <div className="grid grid-cols-2 gap-2">
+        {QUICK_LINKS.map((l) => (
+          <Link
+            key={l.to}
+            to={l.to}
+            className="flex items-center gap-3 rounded-lg border border-surface-border/50 bg-elevated/40 p-3 transition-colors hover:border-accent/40 hover:bg-elevated"
+          >
+            <span className={clsx('grid h-9 w-9 shrink-0 place-items-center rounded-lg text-lg', l.tile)}>{l.icon}</span>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-fg">{l.label}</p>
+              <p className="truncate text-[11px] text-muted">{l.hint}</p>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </Card>
+  )
+}
+
+function Achievements() {
+  const achievements = useGamificationStore((s) => s.achievements)
+  const [showAll, setShowAll] = useState(false)
+  const unlocked = achievements
+    .filter((a) => a.unlocked)
+    .sort((a, b) => (b.unlockedAt ?? '').localeCompare(a.unlockedAt ?? ''))
+  const recent = unlocked.length ? unlocked.slice(0, 3) : achievements.slice(0, 3)
+
+  return (
+    <Card
+      title={unlocked.length ? 'Logros recientes' : 'Primeros logros'}
+      subtitle={`${unlocked.length}/${achievements.length} desbloqueados`}
+      icon="🏅"
+      action={
+        <button onClick={() => setShowAll((v) => !v)} className="text-xs text-accent hover:underline">
+          {showAll ? 'Ocultar' : 'Ver todos'}
+        </button>
+      }
+    >
+      <div className="space-y-2">
+        {recent.map((a) => (
+          <div key={a.id} className="flex items-center gap-3 rounded-lg bg-elevated/50 p-2">
+            <span className={clsx('text-xl', !a.unlocked && 'opacity-40 grayscale')}>{a.icon}</span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm text-fg">{a.name}</p>
+              <p className="truncate text-[11px] text-muted-2">
+                {a.unlocked && a.unlockedAt ? timeAgo(a.unlockedAt) : a.description}
+              </p>
+            </div>
+            <span className="badge bg-accent/10 font-mono text-accent">+{a.xp}</span>
+          </div>
+        ))}
+      </div>
+
+      {showAll && (
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          {achievements.map((a) => (
+            <div
+              key={a.id}
+              title={a.description}
+              className={clsx(
+                'flex items-center gap-2 rounded-lg border p-2',
+                a.unlocked ? 'border-accent/30 bg-accent/5' : 'border-surface-border/40 bg-elevated/30',
+              )}
+            >
+              <span className={clsx('text-lg', !a.unlocked && 'opacity-40 grayscale')}>{a.icon}</span>
+              <p className={clsx('truncate text-xs', a.unlocked ? 'text-fg' : 'text-muted')}>{a.name}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
   )
 }
 
 export default function Dashboard() {
   const user = useUserStore((s) => s.user)
-  const sessions = useUserStore((s) => s.sessions)
-  const xpLog = useUserStore((s) => s.xpLog)
-  const courses = useCourseStore((s) => s.courses)
-  const achievements = useGamificationStore((s) => s.achievements)
-
   const reviews = usePlanStore((s) => s.reviews)
-
-  const level = getLevelInfo(user.totalXP)
+  const now = new Date()
 
   // Domingo sin revisión registrada → recordatorio.
-  const now = new Date()
   const reviewPending =
     dayCodeOf(now) === 'SU' && !reviews.some((r) => r.weekStart === weekStartKey(now))
 
-  // Serie XP acumulada de los últimos 30 días: sesiones + plan, diario y logros.
-  const chart = useMemo(
-    () => xpSeries([...sessions.map((s) => ({ date: s.date, xp: s.xp })), ...xpLog], user.totalXP),
-    [sessions, xpLog, user.totalXP],
-  )
-
-  const unlockedCount = achievements.filter((a) => a.unlocked).length
-  const nearAchievements = achievements.filter((a) => !a.unlocked).slice(0, 3)
-
   return (
     <div className="space-y-6">
-      <header className="animate-fade-in">
-        <p className="text-sm text-muted">Buen día, capitán 👋</p>
-        <h1 className="text-2xl font-bold text-fg sm:text-3xl">
-          Dashboard · {level.title}
-        </h1>
+      <header className="flex flex-wrap items-end justify-between gap-3 animate-fade-in">
+        <div>
+          <h1 className="text-2xl font-bold text-fg sm:text-3xl">
+            ¡{greeting(now.getHours())}, {user.name}!
+          </h1>
+          <p className="text-sm text-muted">Disciplina hoy, libertad mañana.</p>
+        </div>
+        <p className="badge bg-control/60 text-fg-soft first-letter:uppercase">
+          {format(now, "EEEE d 'de' MMMM", { locale: es })}
+        </p>
       </header>
-
-      {/* Stats */}
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatBox label="Total XP" value={user.totalXP.toLocaleString('es-PE')} icon="⚡" accent="cyan" hint={`${xpToNextLevel(user.totalXP)} XP al siguiente nivel`} />
-        <StatBox label="Nivel" value={`${level.level}/10`} icon="🎖️" accent="violet" hint={level.title} />
-        <StatBox label="Racha" value={`${user.streak} 🔥`} icon="📅" accent="amber" hint="días consecutivos" />
-        <StatBox label="Sesiones" value={user.sessions} icon="✅" accent="emerald" hint={`${sessions.length} registradas aquí`} />
-      </section>
 
       {reviewPending && (
         <Link
-          to="/review"
+          to="/revision"
           className="flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 transition-colors hover:bg-amber-500/15 animate-fade-in"
         >
           <span className="text-2xl">🧭</span>
@@ -104,176 +272,22 @@ export default function Dashboard() {
         </Link>
       )}
 
-      {/* Fase actual del Plan Millonario */}
-      <CurrentPhaseCard compact />
+      <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <LevelCard />
+        <NowCard />
+      </section>
 
-      {/* Bloque de día */}
-      <DaySchedule />
+      <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <DailyGoals />
+        <MonthlyGoals linkToPage />
+        <AreaProgress />
+      </section>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* XP chart */}
-        <Card
-          className="lg:col-span-2"
-          title="Progreso de XP"
-          subtitle="Últimos 30 días · estudio, plan, diario y logros"
-          icon="📈"
-          action={<span className="badge bg-cyan-500/10 text-cyan-700 dark:text-cyan-300">{formatXP(user.totalXP)}</span>}
-        >
-          <XPChart points={chart} />
-          <div className="mt-1 flex justify-between text-[10px] text-muted-2">
-            <span>{chart[0]?.label}</span>
-            <span>hoy</span>
-          </div>
-        </Card>
-
-        {/* Próximos hitos */}
-        <Card title="Próximos hitos" subtitle="Nivel y logros" icon="🎯">
-          <div className="mb-4">
-            <ProgressBar
-              value={levelProgress(user.totalXP)}
-              label={`Nivel ${level.level} → ${level.level + 1}`}
-              showValue
-              gradient="violet"
-            />
-            <p className="mt-1 text-xs text-muted">
-              Faltan <span className="font-semibold text-fg">{xpToNextLevel(user.totalXP)} XP</span>
-            </p>
-          </div>
-          <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted">
-              Logros por desbloquear
-            </p>
-            {nearAchievements.map((a) => (
-              <div key={a.id} className="flex items-center gap-3 rounded-lg bg-elevated/50 p-2">
-                <span className="text-lg opacity-70 grayscale">{a.icon}</span>
-                <div className="min-w-0">
-                  <p className="truncate text-sm text-fg">{a.name}</p>
-                  <p className="truncate text-[11px] text-muted-2">{a.description}</p>
-                </div>
-                <span className="ml-auto badge bg-control/60 text-fg-soft">+{a.xp}</span>
-              </div>
-            ))}
-            <p className="pt-1 text-[11px] text-muted-2">
-              {unlockedCount}/{achievements.length} logros desbloqueados
-            </p>
-          </div>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Course stats */}
-        <Card className="lg:col-span-2" title="Progreso por curso" subtitle="Ciclo 4 · 6 cursos" icon="📚">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {courses.map((c) => {
-              const p = courseProgress(c)
-              return (
-                <div key={c.id}>
-                  <div className="mb-1 flex items-center gap-2 text-sm">
-                    <span>{c.icon}</span>
-                    <span className="truncate text-fg">{c.name}</span>
-                  </div>
-                  <ProgressBar
-                    value={p}
-                    showValue
-                    size="sm"
-                    gradient={p >= 100 ? 'green' : 'accent'}
-                  />
-                </div>
-              )
-            })}
-          </div>
-        </Card>
-
-        {/* Quick actions */}
-        <Card title="Acciones rápidas" subtitle="Atajos del día" icon="⚡">
-          <div className="space-y-3">
-            <Link
-              to="/study"
-              className="flex items-center gap-3 rounded-lg bg-accent/10 p-3 text-accent transition-colors hover:bg-accent/20"
-            >
-              <span className="text-lg">⏱️</span>
-              <div>
-                <p className="text-sm font-semibold">Iniciar sesión de estudio</p>
-                <p className="text-[11px] text-cyan-900 dark:text-cyan-200/70">Timer Pomodoro + XP en vivo</p>
-              </div>
-            </Link>
-            <Link
-              to="/health"
-              className="flex items-center gap-3 rounded-lg bg-elevated/60 p-3 text-fg transition-colors hover:bg-elevated"
-            >
-              <span className="text-lg">⚽</span>
-              <div>
-                <p className="text-sm font-semibold">Registrar entrenamiento</p>
-                <p className="text-[11px] text-muted">Futsal · mar y sáb 09:00–11:00</p>
-              </div>
-            </Link>
-            <Link
-              to="/review"
-              className="flex items-center gap-3 rounded-lg bg-elevated/60 p-3 text-fg transition-colors hover:bg-elevated"
-            >
-              <span className="text-lg">🧭</span>
-              <div>
-                <p className="text-sm font-semibold">Revisión semanal</p>
-                <p className="text-[11px] text-muted">Domingo 18:00–19:00 · indicadores</p>
-              </div>
-            </Link>
-            <Link
-              to="/streakstudy"
-              className="flex items-center gap-3 rounded-lg bg-elevated/60 p-3 text-fg transition-colors hover:bg-elevated"
-            >
-              <span className="text-lg">🚀</span>
-              <div>
-                <p className="text-sm font-semibold">Avanzar StreakStudy</p>
-                <p className="text-[11px] text-muted">Features y bugs del proyecto</p>
-              </div>
-            </Link>
-          </div>
-        </Card>
-      </div>
-
-      {/* Logros */}
-      <Card
-        title="Logros"
-        subtitle="Desbloquéalos usando la app"
-        icon="🏅"
-        action={
-          <span className="badge bg-control/60 text-fg-soft">
-            {unlockedCount}/{achievements.length}
-          </span>
-        }
-      >
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-          {achievements.map((a) => (
-            <div
-              key={a.id}
-              title={a.description}
-              className={
-                'flex items-center gap-2 rounded-lg border p-2.5 ' +
-                (a.unlocked
-                  ? 'border-accent/30 bg-accent/5'
-                  : 'border-surface-border/40 bg-elevated/30')
-              }
-            >
-              <span className={'text-xl ' + (a.unlocked ? '' : 'opacity-40 grayscale')}>
-                {a.icon}
-              </span>
-              <div className="min-w-0">
-                <p
-                  className={
-                    'truncate text-xs font-medium ' +
-                    (a.unlocked ? 'text-fg' : 'text-muted')
-                  }
-                >
-                  {a.name}
-                </p>
-                <p className="text-[10px] text-muted-2">
-                  {a.unlocked ? `Desbloqueado · +${a.xp}` : `+${a.xp} XP`}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
+      <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <XPBars />
+        <QuickLinks />
+        <Achievements />
+      </section>
     </div>
   )
 }

@@ -1,13 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import {
-  sessionXP,
   getLevelInfo,
   levelProgress,
   xpToNextLevel,
   topicProgress,
   courseProgress,
   courseStatus,
-  BASE_XP_PER_SESSION,
 } from './gamification'
 import type { Course, Topic } from '@/types'
 
@@ -28,20 +26,6 @@ const course = (topics: Topic[], progress = 0): Course => ({
   description: '',
   progress,
   topics,
-})
-
-describe('sessionXP', () => {
-  it('es 50 base para una sesión de 0 minutos', () => {
-    expect(sessionXP(0)).toBe(BASE_XP_PER_SESSION)
-  })
-
-  it('suma 0.5 XP por minuto y redondea (45 min → 73)', () => {
-    expect(sessionXP(45)).toBe(73) // 50 + 22.5 → 73
-  })
-
-  it('90 min → 95 XP', () => {
-    expect(sessionXP(90)).toBe(95)
-  })
 })
 
 describe('getLevelInfo', () => {

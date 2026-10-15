@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom'
 import { clsx } from 'clsx'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import { Card } from '@/components/common'
+import { Card, DayToggles } from '@/components/common'
 import { toMinutes, blockDays, WEEK_DAYS, type TimeBlock } from '@/data/schedule'
 import { useScheduleStore } from '@/store'
+import { NAV_LINKS } from '@/data/nav'
 import { formatDuration, dayCodeOf } from '@/utils'
-import type { DayCode } from '@/types'
 
 type BlockStatus = 'done' | 'current' | 'upcoming'
 
@@ -18,42 +18,8 @@ interface EnrichedBlock extends TimeBlock {
 
 const ROUTE_OPTIONS = [
   { value: '', label: 'Sin enlace' },
-  { value: '/study', label: 'Study' },
-  { value: '/health', label: 'Salud' },
-  { value: '/streakstudy', label: 'StreakStudy' },
-  { value: '/plan', label: 'Plan' },
-  { value: '/journal', label: 'Diario' },
-  { value: '/review', label: 'Revisión' },
-  { value: '/roadmap', label: 'Roadmap' },
+  ...NAV_LINKS.map((l) => ({ value: l.to, label: l.label })),
 ]
-
-function DayToggles({ value, onChange }: { value: DayCode[]; onChange: (days: DayCode[]) => void }) {
-  return (
-    <div className="flex gap-0.5" role="group" aria-label="Días">
-      {WEEK_DAYS.map((d) => {
-        const on = value.includes(d.code)
-        return (
-          <button
-            key={d.code}
-            type="button"
-            onClick={() => {
-              const next = on ? value.filter((c) => c !== d.code) : [...value, d.code]
-              // Al menos un día; mantiene el orden L→D.
-              if (next.length) onChange(WEEK_DAYS.map((w) => w.code).filter((c) => next.includes(c)))
-            }}
-            className={clsx(
-              'h-6 w-6 rounded text-[10px] font-semibold transition-colors',
-              on ? 'bg-accent/20 text-accent' : 'bg-control/50 text-muted-2 hover:text-fg',
-            )}
-            aria-pressed={on}
-          >
-            {d.short}
-          </button>
-        )
-      })}
-    </div>
-  )
-}
 
 function ScheduleEditor() {
   const blocks = useScheduleStore((s) => s.blocks)
@@ -153,10 +119,10 @@ function ScheduleEditor() {
   )
 }
 
-export function DaySchedule() {
+/** Bloques de hoy con su estado (hecho / ahora / próximo), refrescados cada 30 s. */
+export function useTodayBlocks() {
   const scheduleBlocks = useScheduleStore((s) => s.blocks)
   const [now, setNow] = useState(() => new Date())
-  const [editing, setEditing] = useState(false)
 
   // Refresco cada 30s para mover el resaltado del bloque actual.
   useEffect(() => {
@@ -186,8 +152,18 @@ export function DaySchedule() {
       })
   }, [scheduleBlocks, today, nowMin])
 
-  const current = blocks.find((b) => b.status === 'current')
-  const next = blocks.find((b) => b.status === 'upcoming')
+  return {
+    now,
+    nowMin,
+    blocks,
+    current: blocks.find((b) => b.status === 'current'),
+    next: blocks.find((b) => b.status === 'upcoming'),
+  }
+}
+
+export function DaySchedule() {
+  const { now, nowMin, blocks, current, next } = useTodayBlocks()
+  const [editing, setEditing] = useState(false)
 
   const summary = current
     ? `Ahora: ${current.label} · termina ${current.end}`

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { xpSeries, trimXPLog } from './xpHistory'
+import { xpSeries, trimXPLog, xpDaily, xpStreak } from './xpHistory'
 
 const at = (s: string) => new Date(`${s}T12:00:00`).toISOString()
 const today = new Date('2026-10-25T18:00:00')
@@ -42,5 +42,40 @@ describe('trimXPLog', () => {
       { date: at('2026-10-01'), xp: 20 },
     ]
     expect(trimXPLog(log, today)).toEqual([log[1]])
+  })
+})
+
+describe('xpDaily', () => {
+  it('suma lo ganado por día, sin acumular', () => {
+    const events = [
+      { date: at('2026-10-24'), xp: 30 },
+      { date: at('2026-10-24'), xp: 20 },
+      { date: at('2026-10-25'), xp: 10 },
+    ]
+    const days = xpDaily(events, today, 3)
+    expect(days.map((d) => d.value)).toEqual([0, 50, 10])
+    expect(days[2].key).toBe('2026-10-25')
+  })
+})
+
+describe('xpStreak', () => {
+  it('cuenta días seguidos con XP hasta hoy', () => {
+    const events = ['2026-10-23', '2026-10-24', '2026-10-25'].map((d) => ({ date: at(d), xp: 10 }))
+    expect(xpStreak(events, today)).toBe(3)
+  })
+
+  it('si hoy aún no ganaste, la racha sigue desde ayer', () => {
+    const events = ['2026-10-23', '2026-10-24'].map((d) => ({ date: at(d), xp: 10 }))
+    expect(xpStreak(events, today)).toBe(2)
+  })
+
+  it('un día sin XP (o con XP neto negativo) corta la racha', () => {
+    const events = [
+      { date: at('2026-10-22'), xp: 10 },
+      { date: at('2026-10-24'), xp: 10 },
+      { date: at('2026-10-24'), xp: -10 },
+      { date: at('2026-10-25'), xp: 10 },
+    ]
+    expect(xpStreak(events, today)).toBe(1)
   })
 })

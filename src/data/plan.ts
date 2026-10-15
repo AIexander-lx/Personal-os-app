@@ -1,5 +1,5 @@
 import raw from './plan-millonario.json'
-import type { Goal, Plan } from '@/types'
+import type { DayCode, Goal, Plan } from '@/types'
 
 /**
  * Plan Millonario. Los datos viven en `plan-millonario.json` para poder
@@ -20,3 +20,8 @@ export const AREA_LABEL = {
   trading: 'Trading',
   reading: 'Lectura',
 } as const
+
+/** Días de entrenamiento según los bloques de salud del horario semanal. */
+export const TRAINING_DAYS = new Set<DayCode>(
+  plan.weeklyBlocks.filter((b) => b.category === 'salud').map((b) => b.day),
+)

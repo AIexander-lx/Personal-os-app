@@ -6,11 +6,7 @@ export interface Achievement {
   xp: number
   /** Optional hint used to auto-check unlock conditions in the store. */
   condition?:
-    | 'first-session'
-    | 'streak-7'
-    | 'hours-100'
     | 'level-10'
-    | 'streak-30'
     | 'plan-first-client'
     | 'plan-90-complete'
     | 'review-1'

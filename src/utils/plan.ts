@@ -95,6 +95,9 @@ export function checklistXP(id: string): number {
 
 export const PHASE_TASK_XP = 25
 export const REVIEW_XP = 50
+/** XP por ítem del checklist diario, y bono por completarlos todos en un día. */
+export const DAILY_ITEM_XP = 10
+export const PERFECT_DAY_XP = 50
 
 /**
  * La revisión da XP solo si es de esta semana o de la anterior (se puede

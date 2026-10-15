@@ -1,28 +1,19 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { StudySession, GymEntry, SleepEntry, EnergyEntry, User, XPEvent } from '@/types'
-import { sessionXP, getLevelInfo, todayKey, localDayKey, trimXPLog } from '@/utils'
-import { differenceInCalendarDays, parseISO } from 'date-fns'
+import type { GymEntry, SleepEntry, EnergyEntry, User, XPEvent } from '@/types'
+import { getLevelInfo, todayKey, trimXPLog } from '@/utils'
 
 interface UserState {
   user: User
-  sessions: StudySession[]
   gym: GymEntry[]
   sleep: SleepEntry[]
   energy: EnergyEntry[]
-  /** Historial de XP fuera de las sesiones, para el gráfico del Dashboard. */
+  /** Historial de XP (plan, diario, logros), para el gráfico del Dashboard. */
   xpLog: XPEvent[]
   /** Contadores manuales para logros sin fuente de datos automática. */
   githubCommits: number
   peersHelped: number
 
-  addSession: (input: {
-    courseId: string
-    courseName: string
-    topicId: string
-    topicName: string
-    duration: number
-  }) => StudySession
   addXP: (xp: number) => void
   toggleGym: (date: string, intensity?: number) => void
   logSleep: (date: string, hours: number, quality: number) => void
@@ -37,66 +28,19 @@ const initialUser: User = {
   name: 'Alexander',
   level: 1,
   totalXP: 0,
-  streak: 0,
-  sessions: 0,
   joinDate: '2026-07-14',
-}
-
-/** Recalcula la racha de estudio a partir de las fechas de sesión. */
-function computeStreak(sessions: StudySession[], seed: number): number {
-  if (sessions.length === 0) return seed
-  const days = new Set(sessions.map((s) => localDayKey(s.date)))
-  const sorted = [...days].sort().reverse()
-  let streak = 0
-  let cursor = new Date()
-  for (const day of sorted) {
-    const diff = differenceInCalendarDays(cursor, parseISO(day))
-    if (diff <= 1) {
-      streak += 1
-      cursor = parseISO(day)
-    } else {
-      break
-    }
-  }
-  return Math.max(streak, seed && sessions.length ? 0 : seed)
 }
 
 export const useUserStore = create<UserState>()(
   persist(
     (set) => ({
       user: initialUser,
-      sessions: [],
       gym: [],
       sleep: [],
       energy: [],
       xpLog: [],
       githubCommits: 0,
       peersHelped: 0,
-
-      addSession: (input) => {
-        const xp = sessionXP(input.duration)
-        const session: StudySession = {
-          id: `sess_${Date.now()}`,
-          ...input,
-          xp,
-          date: new Date().toISOString(),
-        }
-        set((state) => {
-          const sessions = [session, ...state.sessions]
-          const totalXP = state.user.totalXP + xp
-          return {
-            sessions,
-            user: {
-              ...state.user,
-              totalXP,
-              level: getLevelInfo(totalXP).level,
-              sessions: state.user.sessions + 1,
-              streak: computeStreak(sessions, state.user.streak),
-            },
-          }
-        })
-        return session
-      },
 
       addXP: (xp) =>
         set((state) => {
@@ -147,7 +91,6 @@ export const useUserStore = create<UserState>()(
       resetAll: () =>
         set({
           user: initialUser,
-          sessions: [],
           gym: [],
           sleep: [],
           energy: [],

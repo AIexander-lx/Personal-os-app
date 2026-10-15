@@ -12,17 +12,8 @@ import {
   STORE_KEYS,
 } from '@/utils'
 import ProgressBar from './ProgressBar'
+import { NAV_LINKS } from '@/data/nav'
 
-const links = [
-  { to: '/', label: 'Dashboard', icon: '🏠', end: true },
-  { to: '/roadmap', label: 'Roadmap', icon: '🗺️' },
-  { to: '/study', label: 'Study', icon: '⏱️' },
-  { to: '/streakstudy', label: 'StreakStudy', icon: '🚀' },
-  { to: '/health', label: 'Salud', icon: '💪' },
-  { to: '/plan', label: 'Plan', icon: '🎯' },
-  { to: '/journal', label: 'Diario', icon: '📒' },
-  { to: '/review', label: 'Revisión', icon: '🧭' },
-]
 
 export function NavBar() {
   const user = useUserStore((s) => s.user)
@@ -89,7 +80,7 @@ export function NavBar() {
               Nivel {level.level} · {level.title}
             </p>
           </div>
-          <span className="badge bg-accent/10 text-accent">{formatXP(user.totalXP)}</span>
+          <span className="badge bg-accent/10 font-mono text-accent">{formatXP(user.totalXP)}</span>
         </div>
         <ProgressBar
           className="mt-3"
@@ -100,11 +91,11 @@ export function NavBar() {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1">
-        {links.map((l) => (
+        {NAV_LINKS.map((l) => (
           <NavLink
             key={l.to}
             to={l.to}
-            end={l.end}
+            end={'end' in l && l.end}
             className={({ isActive }) => clsx('nav-link', isActive && 'nav-link-active')}
           >
             <span className="text-base">{l.icon}</span>
