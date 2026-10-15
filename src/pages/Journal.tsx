@@ -350,7 +350,7 @@ function TradeRow({ t, onEdit, active }: { t: Trade; onEdit: () => void; active:
   )
 }
 
-export default function Journal() {
+export default function Journal({ embedded = false }: { embedded?: boolean }) {
   const trades = useJournalStore((s) => s.trades)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [pairFilter, setPairFilter] = useState<string>('all')
@@ -369,10 +369,14 @@ export default function Journal() {
 
   return (
     <div className="space-y-6">
-      <header className="animate-fade-in">
-        <h1 className="text-2xl font-bold text-fg sm:text-3xl">Diario de trading</h1>
+      {embedded ? (
         <p className="text-sm text-muted">{plan.rules[2]}</p>
-      </header>
+      ) : (
+        <header className="animate-fade-in">
+          <h1 className="text-2xl font-bold text-fg sm:text-3xl">Diario de trading</h1>
+          <p className="text-sm text-muted">{plan.rules[2]}</p>
+        </header>
+      )}
 
       <Card icon="🎯" title={`Meta: ${JOURNAL_GOAL} operaciones en demo`} subtitle="Al llegar, se marca sola en el checklist de 90 días">
         <ProgressBar value={(demoDone / JOURNAL_GOAL) * 100} showValue gradient={demoDone >= JOURNAL_GOAL ? 'green' : 'accent'} />

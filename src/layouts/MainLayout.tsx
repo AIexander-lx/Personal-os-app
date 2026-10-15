@@ -3,6 +3,7 @@ import { Outlet, NavLink } from 'react-router-dom'
 import { clsx } from 'clsx'
 import { NavBar } from '@/components/common'
 import ToastHost from '@/components/ToastHost'
+import { NAV_LINKS } from '@/data/nav'
 import { useUserStore, useCourseStore, useGamificationStore, usePlanStore } from '@/store'
 
 /** Reevalúa los logros ante cualquier cambio relevante de datos. */
@@ -10,7 +11,7 @@ function useAchievementWatcher() {
   const evaluate = useGamificationStore((s) => s.evaluate)
   const userSig = useUserStore(
     (s) =>
-      `${s.user.totalXP}|${s.user.streak}|${s.user.sessions}|${s.gym.length}|${s.sleep.length}|${s.energy.length}|${s.githubCommits}|${s.peersHelped}`,
+      `${s.user.totalXP}|${s.gym.length}|${s.sleep.length}|${s.energy.length}|${s.githubCommits}|${s.peersHelped}`,
   )
   const courseSig = useCourseStore((s) =>
     s.courses
@@ -25,15 +26,7 @@ function useAchievementWatcher() {
   }, [evaluate, userSig, courseSig, planSig])
 }
 
-const mobileLinks = [
-  { to: '/', label: 'Inicio', icon: '🏠', end: true },
-  { to: '/study', label: 'Study', icon: '⏱️' },
-  { to: '/streakstudy', label: 'Streak', icon: '🚀' },
-  { to: '/health', label: 'Salud', icon: '💪' },
-  { to: '/plan', label: 'Plan', icon: '🎯' },
-  { to: '/journal', label: 'Diario', icon: '📒' },
-  { to: '/review', label: 'Revisión', icon: '🧭' },
-]
+const mobileLinks = NAV_LINKS.filter((l) => 'mobile' in l && l.mobile)
 
 export function MainLayout() {
   const [open, setOpen] = useState(false)
@@ -78,12 +71,12 @@ export function MainLayout() {
         </main>
 
         {/* Bottom nav mobile */}
-        <nav className="sticky bottom-0 z-30 grid grid-cols-7 border-t border-surface-border/50 bg-surface/90 backdrop-blur lg:hidden">
+        <nav className="sticky bottom-0 z-30 grid grid-cols-5 border-t border-surface-border/50 bg-surface/90 backdrop-blur lg:hidden">
           {mobileLinks.map((l) => (
             <NavLink
               key={l.to}
               to={l.to}
-              end={l.end}
+              end={'end' in l && l.end}
               className={({ isActive }) =>
                 clsx(
                   'flex flex-col items-center gap-0.5 py-2 text-[10px]',
