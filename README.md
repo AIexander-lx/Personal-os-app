@@ -19,7 +19,7 @@ Aplicación **100% frontend** (sin backend) que centraliza el seguimiento de est
 | --- | --- |
 | 🏠 **Dashboard** | Stats (XP, nivel, racha, sesiones), gráfico de XP de 30 días, **fase actual del plan**, **bloque de día en vivo** con el horario semanal (bloques por día) que resalta la actividad actual, progreso por curso y grid de logros. |
 | 🗺️ **Roadmap** | 6 cursos · 38 temas · 163 ejercicios. Tarjetas expandibles con dificultad y XP por tema, filtros por estado/dificultad y búsqueda. |
-| ⏱️ **Study** | Timer Pomodoro (25/45/90 min o personalizado) con anillo de progreso, cálculo de XP en vivo, historial y estadísticas. El reloj se deriva de un *timestamp*, así que no se desfasa aunque la pestaña quede en segundo plano, y avisa con una **notificación del navegador** al terminar. |
+| 📅 **Horario** | Sincronizado **en vivo con Google Calendar** (solo lectura): clases y fechas de evaluación siempre al día, incluso si un profesor cambia una fecha — se edita en Google Calendar como siempre y aquí se refleja solo. Agrupado por día (Hoy / Mañana / próximos 14 días), resalta evaluaciones (exámenes, PCs, ECs) y permite elegir entre varios calendarios. Ver [configuración](#-horario-con-google-calendar) más abajo. |
 | 🚀 **StreakStudy** | Tracker del proyecto principal: features y bugs con **drag & drop**, fases, barra de completitud y timeline de avances. |
 | 💪 **Health** | Registro de gimnasio semanal (Lun–Vie), racha, y seguimiento de sueño y energía con gráficos de 7 días. |
 | 🎯 **Plan** | Plan Millonario: reglas de oro, checklist de 90 días con XP, temario de 6 fases (la fase actual se calcula con la fecha), metas a 1, 3 y 10 años y contadores de portfolio/comunidad. Los datos están en `src/data/plan-millonario.json`. |
@@ -86,14 +86,40 @@ La app corre en `http://localhost:5173` (o el puerto que asigne Vite).
 
 ---
 
+## 📅 Horario con Google Calendar
+
+La pestaña **Horario** (antes Study) lee en vivo tus eventos de Google Calendar — solo lectura, nunca escribe ni modifica nada. Requiere un OAuth Client ID propio (gratis, de tu cuenta de Google Cloud):
+
+1. Entra a [console.cloud.google.com](https://console.cloud.google.com/) y crea un proyecto (o usa uno existente).
+2. **APIs & Services → Library** → busca **Google Calendar API** → **Enable**.
+3. **APIs & Services → OAuth consent screen**:
+   - User type: *External*.
+   - Completa nombre de la app y tu correo (como soporte y como contacto de desarrollador).
+   - En **Test users**, agrega tu propio correo de Google. Así te basta con dejar la app en modo *Testing* — no hace falta publicarla ni verificarla para uso personal.
+4. **APIs & Services → Credentials → Create Credentials → OAuth client ID**:
+   - Application type: *Web application*.
+   - **Authorized JavaScript origins**: agrega `http://localhost:5173` (y, si despliegas la app, la URL de producción).
+   - No hace falta configurar *Authorized redirect URIs*.
+   - Copia el **Client ID** generado (termina en `.apps.googleusercontent.com`).
+5. Crea un archivo `.env` en la raíz del proyecto (copia `.env.example`) con:
+   ```
+   VITE_GOOGLE_CLIENT_ID=tu-client-id-aqui
+   ```
+6. Reinicia `npm run dev` y entra a **Horario** → **Conectar con Google**. La primera vez Google mostrará *"Google no ha verificado esta app"* (normal en modo Testing) → **Avanzado** → **Ir a Personal OS (no seguro)** → acepta el permiso de solo lectura del calendario.
+
+El token de acceso vive solo en `sessionStorage` del navegador (se renueva solo, sin volver a pedir permiso, mientras la sesión siga activa).
+
+---
+
 ## 📁 Estructura del proyecto
 
 ```
 personal-os/
 ├── src/
-│   ├── pages/          # Dashboard, Roadmap, Study, StreakStudy, Health, Plan, Journal, Review
+│   ├── pages/          # Dashboard, Roadmap, Study (Horario/Google Calendar), StreakStudy, Health, Plan, Journal, Review
 │   ├── components/     # DaySchedule, ToastHost y comunes (Card, ProgressBar, StatBox, NavBar)
-│   ├── store/          # userStore, courseStore, gamificationStore, scheduleStore, planStore, journalStore, toastStore, themeStore
+│   ├── lib/            # googleCalendar (OAuth + fetch de eventos, solo lectura)
+│   ├── store/          # userStore, courseStore, gamificationStore, scheduleStore, calendarStore, planStore, journalStore, toastStore, themeStore
 │   ├── data/           # courses, achievements, schedule, plan (+ plan-millonario.json)
 │   ├── utils/          # gamification, formatters, dataBackup, plan, journal
 │   ├── layouts/        # MainLayout
@@ -119,6 +145,7 @@ Los temas de **AED** y **Sistemas Computacionales** están alineados con el síl
 - [x] Tema claro/oscuro con contraste AA
 - [x] Plan Millonario: metas, fases, revisión semanal
 - [x] Diario de trading
+- [x] Horario sincronizado en vivo con Google Calendar
 - [ ] Backend (Spring Boot + PostgreSQL)
 - [ ] Sincronización multi-dispositivo (AWS)
 - [ ] Autenticación

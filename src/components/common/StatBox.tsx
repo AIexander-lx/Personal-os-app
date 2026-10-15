@@ -26,7 +26,9 @@ export function StatBox({ label, value, icon, hint, accent = 'cyan', className }
         </span>
         {icon && <span className="text-lg opacity-80">{icon}</span>}
       </div>
-      <div className={clsx('mt-2 text-3xl font-bold', accents[accent])}>{value}</div>
+      <div className={clsx('mt-2 font-mono text-3xl font-bold tabular-nums', accents[accent])}>
+        {value}
+      </div>
       {hint && <div className="mt-1 text-xs text-muted">{hint}</div>}
     </div>
   )

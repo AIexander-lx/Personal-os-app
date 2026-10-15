@@ -3,7 +3,6 @@ import { useUserStore } from './userStore'
 import { useCourseStore } from './courseStore'
 import { useGamificationStore } from './gamificationStore'
 import { useScheduleStore } from './scheduleStore'
-import { todayKey } from '@/utils'
 
 beforeEach(() => {
   localStorage.clear()
@@ -11,25 +10,6 @@ beforeEach(() => {
   useCourseStore.getState().resetCourses()
   useGamificationStore.getState().resetAchievements()
   useScheduleStore.getState().resetSchedule()
-})
-
-describe('userStore.addSession', () => {
-  it('crea la sesión con XP correcto y actualiza al usuario', () => {
-    const session = useUserStore.getState().addSession({
-      courseId: 'c',
-      courseName: 'Curso',
-      topicId: 't',
-      topicName: 'Tema',
-      duration: 45,
-    })
-    expect(session.xp).toBe(73)
-
-    const { user, sessions } = useUserStore.getState()
-    expect(user.totalXP).toBe(73)
-    expect(user.sessions).toBe(1)
-    expect(sessions).toHaveLength(1)
-    expect(sessions[0].topicName).toBe('Tema')
-  })
 })
 
 describe('userStore.addXP', () => {
@@ -48,55 +28,23 @@ describe('userStore.addXP', () => {
 })
 
 describe('gamificationStore.evaluate', () => {
-  it('desbloquea "First Session" tras la primera sesión y suma su bono', () => {
-    useUserStore.getState().addSession({
-      courseId: 'c',
-      courseName: 'Curso',
-      topicId: 't',
-      topicName: 'Tema',
-      duration: 25, // 63 XP
-    })
-    const xpAfterSession = useUserStore.getState().user.totalXP
-
-    const newly = useGamificationStore.getState().evaluate()
-    expect(newly.some((a) => a.id === 'ach_1')).toBe(true)
-    // First Session da +100 XP.
-    expect(useUserStore.getState().user.totalXP).toBe(xpAfterSession + 100)
-  })
-
-  it('no vuelve a desbloquear un logro ya obtenido', () => {
-    useUserStore.getState().addSession({
-      courseId: 'c', courseName: 'C', topicId: 't', topicName: 'T', duration: 25,
-    })
-    useGamificationStore.getState().evaluate()
-    const second = useGamificationStore.getState().evaluate()
-    expect(second.some((a) => a.id === 'ach_1')).toBe(false)
-  })
-
   it('GitHub Hero se desbloquea con 50 commits', () => {
     useUserStore.getState().setGithubCommits(50)
     const newly = useGamificationStore.getState().evaluate()
     expect(newly.some((a) => a.id === 'ach_9')).toBe(true)
   })
 
+  it('no vuelve a desbloquear un logro ya obtenido', () => {
+    useUserStore.getState().setGithubCommits(50)
+    useGamificationStore.getState().evaluate()
+    const second = useGamificationStore.getState().evaluate()
+    expect(second.some((a) => a.id === 'ach_9')).toBe(false)
+  })
+
   it('Community Builder se desbloquea con 5 compañeros', () => {
     useUserStore.getState().setPeersHelped(5)
     const newly = useGamificationStore.getState().evaluate()
     expect(newly.some((a) => a.id === 'ach_10')).toBe(true)
-  })
-
-  it('Perfect Day requiere gym + estudio + salud el mismo día', () => {
-    const today = todayKey()
-    useUserStore.getState().addSession({
-      courseId: 'c', courseName: 'C', topicId: 't', topicName: 'T', duration: 30,
-    })
-    // Solo estudio: aún no.
-    expect(useGamificationStore.getState().evaluate().some((a) => a.id === 'ach_4')).toBe(false)
-
-    useUserStore.getState().toggleGym(today)
-    useUserStore.getState().logEnergy(today, 8)
-    const newly = useGamificationStore.getState().evaluate()
-    expect(newly.some((a) => a.id === 'ach_4')).toBe(true)
   })
 
   it("All A's se desbloquea al completar los 6 cursos", () => {

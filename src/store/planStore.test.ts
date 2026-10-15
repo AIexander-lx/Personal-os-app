@@ -114,10 +114,10 @@ describe('logros del plan', () => {
 
   it('mergeAchievements agrega logros nuevos y conserva los desbloqueados', () => {
     const merged = mergeAchievements([
-      { id: 'ach_1', name: 'viejo', description: '', icon: '', xp: 1, unlocked: true, unlockedAt: 'x' },
+      { id: 'ach_13', name: 'viejo', description: '', icon: '', xp: 1, unlocked: true, unlockedAt: 'x' },
     ])
-    expect(merged.find((a) => a.id === 'ach_1')!.unlocked).toBe(true)
-    expect(merged.find((a) => a.id === 'ach_1')!.name).toBe('First Session')
-    expect(merged.some((a) => a.id === 'ach_13')).toBe(true)
+    expect(merged.find((a) => a.id === 'ach_13')!.unlocked).toBe(true)
+    expect(merged.find((a) => a.id === 'ach_13')!.name).toBe('Primer Cliente')
+    expect(merged.some((a) => a.id === 'ach_14')).toBe(true)
   })
 })

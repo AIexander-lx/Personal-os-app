@@ -7,7 +7,7 @@ import { useCourseStore } from './courseStore'
 import { useToastStore } from './toastStore'
 import { usePlanStore } from './planStore'
 import { goal90 } from '@/data/plan'
-import { courseProgress, todayKey, localDayKey } from '@/utils'
+import { courseProgress } from '@/utils'
 
 interface GamificationState {
   achievements: AchievementState[]
@@ -45,39 +45,20 @@ export const useGamificationStore = create<GamificationState>()(
       achievements: initial,
 
       evaluate: () => {
-        const { user, sessions, gym, sleep, energy, githubCommits, peersHelped } =
-          useUserStore.getState()
+        const { user, githubCommits, peersHelped } = useUserStore.getState()
         const { courses } = useCourseStore.getState()
         const { checklist, reviews } = usePlanStore.getState()
         const checklistIds = (goal90.checklist ?? []).map((c) => c.id)
         const plan90Done = checklistIds.length > 0 && checklistIds.every((id) => checklist[id])
-        const totalHours =
-          sessions.reduce((s, x) => s + x.duration, 0) / 60
         const aed = courses.find((c) => c.id === 'course_aed')
         const cloud = courses.find((c) => c.id === 'course_cloud')
         const ml = courses.find((c) => c.id === 'course_ml')
-
-        // Perfect Day: gym + estudio + salud registrados hoy.
-        const today = todayKey()
-        const gymToday = gym.some((g) => g.date === today && g.done)
-        const studyToday = sessions.some((s) => localDayKey(s.date) === today)
-        const healthToday =
-          sleep.some((s) => s.date === today) || energy.some((e) => e.date === today)
-        const perfectDay = gymToday && studyToday && healthToday
 
         // All A's: los 6 cursos al 100%.
         const allAs = courses.length > 0 && courses.every((c) => courseProgress(c) >= 100)
 
         const isMet = (a: AchievementState): boolean => {
           switch (a.condition) {
-            case 'first-session':
-              return user.sessions >= 1
-            case 'streak-7':
-              return user.streak >= 7
-            case 'hours-100':
-              return totalHours >= 100
-            case 'streak-30':
-              return user.streak >= 30
             case 'level-10':
               return user.level >= 10
             case 'plan-first-client':
@@ -91,7 +72,6 @@ export const useGamificationStore = create<GamificationState>()(
             default:
               break
           }
-          if (a.id === 'ach_4') return perfectDay
           if (a.id === 'ach_5') return !!aed && courseProgress(aed) >= 100
           if (a.id === 'ach_6') return !!cloud && courseProgress(cloud) >= 100
           if (a.id === 'ach_7') return !!ml && courseProgress(ml) >= 100

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -11,38 +11,38 @@
    * `.dark` en <html> lo sobrescribe.
    */
   :root {
-    --accent: 21 94 117; /* cyan-800: calibrado para AA sobre fondo claro */
-    --bg: 248 250 252; /* slate-50 */
+    /* Tema "Fintech Dark Pro" — acento menta eléctrico, superficies sólidas y
+       nítidas (sin glass/blur), paleta pensada para lectura de datos/cifras. */
+    --accent: 4 120 87; /* emerald-700: calibrado AA sobre fondo claro */
+    --bg: 247 248 250;
     --bg-raised: 255 255 255; /* white */
-    --line: 203 213 225; /* slate-300 */
-    --fg: 15 23 42; /* slate-900 */
-    --fg-soft: 51 65 85; /* slate-700 */
-    --muted: 71 85 105; /* slate-600 */
-    --muted-2: 100 116 139; /* slate-500 */
-    --elevated: 241 245 249; /* slate-100 */
-    --control: 226 232 240; /* slate-200 */
+    --line: 221 227 234; /* borde frío, sólido */
+    --fg: 11 18 32; /* navy casi negro */
+    --fg-soft: 43 53 69;
+    --muted: 85 98 122;
+    --muted-2: 120 134 156;
+    --elevated: 238 241 245;
+    --control: 227 232 238;
     --input: 255 255 255;
-    --glow-a: 8 145 178;
-    --glow-b: 59 130 246;
-    --glow-strength: 0.1;
+    --grid-alpha: 0.035;
+    --glow-strength: 0.03;
     color-scheme: light;
   }
 
   .dark {
-    --accent: 0 212 255;
-    --bg: 15 23 42; /* slate-950-ish */
-    --bg-raised: 30 41 59; /* slate-800 */
-    --line: 15 52 96; /* azul oscuro */
-    --fg: 236 240 241;
-    --fg-soft: 203 213 225; /* slate-300 */
-    --muted: 165 179 197;
-    --muted-2: 135 150 170; /* calibrado: AA (>=4.5:1) sobre las superficies oscuras */
-    --elevated: 30 41 59; /* slate-800 */
-    --control: 51 65 85; /* slate-700 */
-    --input: 15 23 42;
-    --glow-a: 0 212 255;
-    --glow-b: 59 130 246;
-    --glow-strength: 0.08;
+    --accent: 16 229 168; /* menta eléctrico */
+    --bg: 10 14 20; /* casi negro, tinte navy */
+    --bg-raised: 17 24 38; /* panel sólido, plano (sin transparencia) */
+    --line: 31 42 58; /* borde fino pero visible */
+    --fg: 231 237 245;
+    --fg-soft: 195 206 219;
+    --muted: 139 155 176;
+    --muted-2: 107 122 144; /* calibrado: AA (>=4.5:1) sobre las superficies oscuras */
+    --elevated: 22 30 44;
+    --control: 28 38 54;
+    --input: 13 19 28;
+    --grid-alpha: 0.05;
+    --glow-strength: 0.05;
     color-scheme: dark;
   }
 
@@ -54,17 +54,13 @@
 
   body {
     @apply bg-surface text-fg antialiased;
+    /* Grid técnico sutil (look "data/fintech") + un único halo tenue arriba a
+       la derecha, en vez del glow difuso multicolor anterior. */
     background-image:
-      radial-gradient(
-        1200px 600px at 100% -10%,
-        rgb(var(--glow-a) / var(--glow-strength)),
-        transparent
-      ),
-      radial-gradient(
-        900px 500px at -10% 110%,
-        rgb(var(--glow-b) / calc(var(--glow-strength) * 0.75)),
-        transparent
-      );
+      linear-gradient(rgb(var(--fg) / var(--grid-alpha)) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--fg) / var(--grid-alpha)) 1px, transparent 1px),
+      radial-gradient(1100px 600px at 100% -10%, rgb(var(--accent) / var(--glow-strength)), transparent);
+    background-size: 44px 44px, 44px 44px, 100% 100%;
     background-attachment: fixed;
     font-family: 'Roboto', system-ui, sans-serif;
     transition: background-color 0.2s ease, color 0.2s ease;
@@ -83,28 +79,29 @@
 }
 
 @layer components {
+  /* Superficie sólida y nítida: sin glass/blur, con sombra corta para dar
+     profundidad mínima — patrón de card "fintech" (Linear/TradeZella). */
   .card-surface {
-    @apply rounded-card border border-surface-border/60 bg-surface-raised/70 backdrop-blur-sm;
+    @apply rounded-card border border-surface-border bg-surface-raised shadow-sm shadow-black/5 dark:shadow-black/30;
   }
 
+  /* Barra de acento superior en vez de degradado diagonal: patrón clásico
+     de stat-card en dashboards de datos. */
   .stat-gradient {
-    background-image: linear-gradient(
-      135deg,
-      rgb(var(--accent) / 0.12),
-      rgb(var(--elevated) / 0.35)
-    );
+    @apply border-t-2 border-t-accent/70;
   }
 
   .nav-link {
-    @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-elevated/70 hover:text-fg;
+    @apply flex items-center gap-3 rounded-lg border-l-2 border-transparent px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-elevated/70 hover:text-fg;
   }
   .nav-link-active {
     /* En claro el tinte va más suave: el fondo usa la misma var que el texto,
-       así que un tinte fuerte reduciría el contraste en vez de mejorarlo. */
-    @apply bg-accent/[0.06] text-accent shadow-glow dark:bg-accent/10;
+       así que un tinte fuerte reduciría el contraste en vez de mejorarlo.
+       El indicador es el borde izquierdo, no un glow — más "preciso". */
+    @apply border-l-accent bg-accent/[0.06] text-accent dark:bg-accent/10;
   }
 
   .badge {
-    @apply inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium;
+    @apply inline-flex items-center gap-1 rounded-md border border-surface-border/70 px-2 py-0.5 text-xs font-medium;
   }
 }

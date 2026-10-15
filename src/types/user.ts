@@ -1,15 +1,3 @@
-export interface StudySession {
-  id: string
-  courseId: string
-  courseName: string
-  topicId: string
-  topicName: string
-  /** Duration in minutes. */
-  duration: number
-  xp: number
-  date: string // ISO string
-}
-
 export interface GymEntry {
   date: string // yyyy-MM-dd
   done: boolean
@@ -38,7 +26,5 @@ export interface User {
   name: string
   level: number
   totalXP: number
-  streak: number
-  sessions: number
   joinDate: string
 }

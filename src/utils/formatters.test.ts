@@ -1,14 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatClock, formatDuration, formatXP, localDayKey, todayKey } from './formatters'
-
-describe('formatClock', () => {
-  it('formatea segundos como mm:ss con padding', () => {
-    expect(formatClock(0)).toBe('00:00')
-    expect(formatClock(65)).toBe('01:05')
-    expect(formatClock(600)).toBe('10:00')
-    expect(formatClock(45 * 60)).toBe('45:00')
-  })
-})
+import { formatDuration, formatXP, localDayKey, todayKey } from './formatters'
 
 describe('formatDuration', () => {
   it('solo minutos', () => {
